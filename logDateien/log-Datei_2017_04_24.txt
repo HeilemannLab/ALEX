@@ -1,0 +1,52 @@
+2017/04/24
+
+git version: 12.04.2017, but changed since
+
+change:
++ new laser class, old one is "laser_working", new one is "laser_test"
++ changed writeAnalogF64 to writeDigitalU8
++ changed analogevoltagechannel to digitaloutputchannel
++ changed timing from "" (which means internal clock) to "/Dev1/ctr0out" which is the synchronizing pulse
+
+result:
++ requested value is not supported for this property
+
+change:
++ change timing to "/Dev1/PFI0"
+
+result:
++ same
+
+change:
++ change timing back to " "(not defined, so it's internal clock)
+
+result:
++ same
+
+change:
++ change timing to finitesamps and PFI0
+
+result:
++ same
+
+change:
++ "" and finitesamps
+
+result:
++ same
+
+change:
++ timing to "ctr0InternalOutput"
+
+result:
++ same
+
+change:
++ schalte trigger dazu
+
+result:
++ same
+
+############
+git push
+############

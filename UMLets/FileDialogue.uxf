@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>20</x>
+      <y>20</y>
+      <w>400</w>
+      <h>210</h>
+    </coordinates>
+    <panel_attributes>FileDialogue
+saveFiles.py
+--
+- _dict: libs.dictionary.UIsettings
+- _plot: libs.plotIllumination.plotIllumination
+--
+- __init__()
+- refreshSettings(dict dictionary)
+- SortTasks(string keyword, filehandler filename, ndarray data)
+- saveDataToTxt(filehandler filename, ndarray data)
+- saveDataToHDF5()
+- saveDict(filehandler filename)
+- loadDict(filehandler filename)
+- createFolder(filehandler filename)</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>

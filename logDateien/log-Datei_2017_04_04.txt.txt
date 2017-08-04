@@ -1,0 +1,264 @@
+2017/04/04
+
+git pull: version vom 03.04.2017
+
+result:
++ continuous 1khz ok
++ 2te continuous daqmx error -50103, kein puls auf dem oszi
++ 3te continuous wieder ok
++ finite 1khz 300s manually stopped, ok
++ finite 1khz 3s nicht gestoppt, ok
++ finite 10hz 30s nicht gestoppt, ok
+
+change:
++ pulse generator an
+
+result:
++ 1hz hängt irgendwie
+
+change:
++ neustart
+
+result:
++ 10kHz, 1kHz, 100Hz, 10Hz, 1Hz gestartet/gestoppt, files ok
+
+change:
++ self._data getter aus stopBtn aus-#
+
+result:
++ error, no attribute self._data
+
+change:
++ type(message) == np.ndarray aus-#
+
+result:
++ 1Hz, 10Hz, 100Hz, 1kHz, 10kHz start/stop ok, files ok
+
+change:
++ duration & sample frequency and data points in den header
+
+result:
++ header ok
+
+change:
++ erste zeile löschen ( np.delete(self._data, 0, 0)) und self._steps - 1
+
+result:
++ erste zeile immer noch da
+
+change:
++ x = numpy.delete(x, (0), axis=0)
+
+result:
++ zeile 0 gelöscht!
+
+change:
++ einheiten im header hinzufügen
+
+result:
++ neuer header
+
+change:
++ animation hinzufügen
+
+result:
++ continuous klappt
++ finite alles ok, bis aufs speichern
+
+change:
++ try/except struktur um save in stopBtn
+
+result:
++ continuous ok
++ finite friert beim saven ein, kein puls auf dem oszi
+
+change:
++ nach anim._stop anim.__delattr__
+
+result:
++ programm friert bei saven ein
+
+change:
++ __delattr__ gelöscht
++ repeat bei cont true bei finite false, wird an animate() übergeben
+
+result:
++ friert wieder beim saven...aber nur bei durchlaufen
++ saven mit manuell stoppen nicht ausprobiert
+
+change:
++ restart
+
+result:
++ continuous 2x start/stop ok
++ continuous mit pulsgen ok
++ finite manuell stoppen und saven bringt ncol x.shape[1] error in savetxt
+
+change:
++ sending data hinter if it>steps abfrage und in die try/except struktur
+
+result:
++ continuous ok
++  finite 10hz 30s ok, nach beenden 10 sekunden, dann "data sent", noch kein "stopped"
++ programm nicht eingefroren... aber kein stop, kein save
++ kein puls auf dem oszi, alle tasks geschlossen
+
+change:
++ timeout in anim._stop(timout=1.0)
+
+result:
++ _stop() kennt kein timeout
+
+change:
++ try/except struktur um _stop()
+
+result:
++ finite manually stopped, error: tiple not ndarray
+
+change:
++ eigene resultQ nur für self._data
+
+result:
++ saving ok, kein progressbar
+
+change:
++ try: self._anim.__del__() in closeApp
++ animate() letztes statement in startBtn()
+
+result:
++ continuous klappt + progress bar busy mode
++ finite klappt, saving auch, nur kein progressBar
+
+change:
++ timeout=0.5 bei messageQ
+
+result:
++ continuous ok
++ finite 10hz 3s ok, progressBar da, aber friert wieder ein...
+
+change:
++ timeout erhöht auf 1.0, die stopMessage "-1" wurde gesendet
+
+result:
++ keine veränderung
+
+change:
++ print("stop message received) hinter signal.taskDone.emit()
+
+result:
++ continuous ok
++ finite manually stopped ok
++ finite nicht gestoppt, friert, signal emittet
+
+change:
++ change break to continue in while loop in waitforstopmessage()
+
+result:
++ alles top
+
++++++++++++++++++
+git push
++++++++++++++++++
+
+change:
++ ylim in anim.processless.plot aus-#
+
+result:
++ plot irgendwo
+
+change:
++ set_ylim(auto=True)
+
+result:
++ kein autoscale
+
+change:
++ in update() self._greenLine.autoscale()
+
+result:
++ Line2D has no attribute autoscale
+
+change:
++ self.ax_green.autoscale()
+
+result:
++ komisches scaling
+
+change:
++ self.ax.relim(), self.ax.autoscale_view(scalex=False, scaley=True)
+
+result:
++ stranges scaling, immer 0.5
+
+change:
++ tight=False
+
+result:
++ wie zuvor
+
+change:
++ tight =True
+
+result:
++ wie zuvor
+
+change:
++ self.ax.autoscale()
+
+result:
++ wie zuvor
+
+change:
++ set_ylim(-1, 10)
+
+result:
++ wie zuvor
+
+change:
++ alle scaling funtionen aus-#
++ set_ylim(bottom=0)
+
+result:
++ normale werte aber kein rescale
+
+change:
++ auto=True in set_ylim
+
+result:
++ kein rescale
+
+change:
++ bottom=-1
++ auto undefiniert
++ ax.relim ent-#
+
+result:
++ kein rescale
+
+change:
++ auto wieder True
+
+result:
++ wie zuvor
+
+change:
++ save umgeschrieben und rescale
+
+result:
++ app friert
+
+change:
++ rescale aus-#
+
+result:
++ continuous 10hz, app friert nach stopp
+
+change:
++ try/except um resultQ und timeout=1.0
+
+result:
++ ok
+
+########
+git push
+########

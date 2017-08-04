@@ -1,0 +1,120 @@
+2017/04/03
+
+git pull: version vom 31.03.2017
+
+result:
++ continuous 1khz ok, start stop ok
++ continuous 1khz again, daqmx error -50103
+
+change:
++ while schleif ein waitForStopMessage() außerhalb der if abfragen
+
+result:
++ continuous 1khz 4x gestartet und gestoppt
++ nachher kein puls auf dem oszi
++ finite ruft qwidget recursive repaint detected
+
+change:
++ connect to signal with lambda function
+
+result:
++ 2x continuous 1khz gestartet und gestoppt, kein puls auf dem oszi
++ finite 1khz 300s 2x gestarted und gestoppt, busy mode progressbar... kein puls auf dem oszi
+
+change:
++ signal.emit vor die if stop abfrage in waitforstopmessage
+
+result:
++ 2x continuous 1khz gestarted und gestoppt, kein puls
++ 1x finite 1khz 300s gestoppt, ok
++ 2te mal finite 1khz 300s gestoppt ->print future warning: elementwise comparison failed; returning scalar instead, but in the future will perform elementwise comparison
+
+change:
++ change message "stop" to -1
+
+result:
++ 2x continuous start/stop ok
++ 3x finite 1khz 300s gestoppt, ok, kein puls auf dem oszi, keine future warning, immer noch kein progress, sondern busy mode
+
+change:
++ print(from message: iteration) hinter message receiver
+
+result:
++ 2x continuous 1khz gestarted und gestoppt, print ok
++ 2x finite gestartet und gestoppt, print ok, progreesbar immer noch im busy mode
+
+change:
++ print aus-#
++ signal ohne lambda, nur signal(int), connect(self.f) und emit(message)
+
+result:
++ continuous und finite mehrere messungen, bei beidem busy mode progressbar
+
+change:
++ print in setProgressValue
+
+result:
++ 2x continuous gestartet und gestoppt
++ 2x finite gestartet und gestoppt, kein print nach signal emission, busy mode progress bar
+
+change:
++ decorate self.stopBtn and self.waitForStopMessage with pyqtSlot
+
+result:
++ 2x continuous ok, keine iteration geprinted nach signal emission
++ 1x finite manually stopped, 1x durhcgelaufen, beide ok, nur progress in busy mode, keine iteration geprinted nach emission
+
+change:
++ change signal(int) to signal(object)
+
+result:
++ continuous 2x, finite 2x, gestartet/gestoppt ohne probleme, beide in busy mode, beide kein iteration print
+
+change:
++ measurementProgress signal connect(lambda x: f(x))
+
+result:
++ keine veränderung
+
+change:
++ eigene klasse für zweite signal
+
+result:
++ keine veränderung
+
+change:
++ keine if abfage mehr für die message
+
+result:
++ print nach signal emission funktioniert
++ kein progressbar bei finite
+
+change:
++ signal zurück in eine klasse integrieren
+
+result:
++ keine änderung
+
+change:
++ if type(message) == np.array:
+signal und break
+
+result:
++ kein error, 2x continuous und finite gestoppt und durchgelaufen
+
+change:
++ setRange(0, 100) und setValue(iteration/self._steps)
+
+result:
++ keine veränderung
+
+change:
++ setRange(0, self._steps) und setValue(iteration) und self._steps abfrage in self.startBtn()
+
+result:
++ finite hat progressBar :)))
+
+
+
+
+

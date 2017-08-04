@@ -1,0 +1,108 @@
+2017/07/26
+
+git version: no git
+
+change:
++ new thread for lcd numbers
++ changed the check "dataProcesser.is_alive()" to ".isAlive()"
++ join all openend threads and processes
+
+result:
++ new thread too fast, no data at the beginning, also causes animation to lack of data
++ dataProcesser object has no attribute "isAlive"
+
+change:
++ back to "is_alive()"
++ timeouts on lcd numbers are 0.5 now
+
+result:
++ nothing run properly anymore
+
+change:
++ create a q for the lcd's
+
+
+result:
++ holprige ausführung
++ keine lcd anzeige
+
+change:
++ thread in startProcesses verschoben
++ time.sleep(2.0) davor
+
+result:
++ immer noch keine lcd anzeige
++ holprige ausführung
+
+change:
++ erase timeout from .get() in displayLCD
+
+result:
++ does not change anything
+
+change:
++ int to float in signal.LCDnumbers
+
+result:
++ strange lcd anzeig auf einem display
+
+change:
++ signal structure: keine argumente mehr spezifiziert. nur in emit(g, r) und in empfänger-funktion(x, y)
+
+result:
++ keine anzeige, dafür error bei animation in regelmäßigen abständen
+
+change:
++ keine anzeige
+
+change:
++ analogoutput dazu
+
+result:
++ dict.getitem nicht subscriptable
+
+change:
++ dict._a.getitem
+
+result:
++ sampsPerChanToAcquire wrong keyword argumente
++ nothing joins
+
+change:
++ sampsPerChan
+
+result:
++ keine animation mehr
+
+change:
++ alle lcd sachen raus
+
+result:
++ sync pulse kommt nicht mehr an
++ rtsi cable gibt kein signal mehr weiter
+
+change:
++ export signal zu dev2/rtsi0 und dev1/rtsi2
+
+result:
++ keine animation
+
+change:
++ found signal.lcdnumbers in amination.py
+
+result:
++ cont ok
++ 1x finit 30s ok
++ dann freeze beim versuch finit zu starten
+
+change:
++ del dataprocesser
+
+result:
++ auch kein join
+
+change:
++ del animation dazu
+
+result:
++ two consecutive finite starts possible

@@ -1,0 +1,53 @@
+2017/07/24
+
+git version: ?
+
+result:
++ continuous: start&stop ok
++ dataprocesser: elementwise comparison failed
++ dataprocesser: numpy.ndarray has no attribute append
++ window exit shuts down program properly
+
+change:
++ try np.vstack((a, b))
+
+result:
++ dataprocessor: all the input array dimension must match, except concatenation axis
+
+change:
++ switch to concatenation
+
+result:
++ only integer scalar arrays can be converted to a scalar index
+
+change:
++ np.append()
+
+result:
++ dataprocesser: elementwise comparison failed
++ apd.py: no tasks started
+
+change:
++ start all apd.py tasks
+
+result:
++ still problem with apd.py tasks
++ elementwise comparison failed in dataprocesser
+
+change:
++ sort out apd.py tasks
++ change highest count from float to scalar
+
+result:
++ still the comparison problem...
+
+change:
++ mark counter and processer instances more clearly
++ make counter 2 join also
+
+result:
++ still comparison problem
++ joining and marking processes successfull
+
+change:
++ 
