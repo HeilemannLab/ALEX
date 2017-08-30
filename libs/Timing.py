@@ -13,14 +13,27 @@ from PyDAQmx import *
 import libs.dictionary
 
 
-class SampleClock():
+class SampleClock:
+    """
+    This class configures the pulse train, which serves as trigger signal.
+    Maybe it could be changed to a single edge. The pulse is created on
+    the 6713 card, which should be 'Device 1'.
+    """
     def __init__(self):
         self._dict = libs.dictionary.UIsettings()
+        self._timingPuls = None
+        self._freq = 0
 
     def refreshSettings(self, dictionary):
-        self._dict._a = dictionary
+        self._dict._a.update(dictionary)
 
-    def Pulse(self):
+    def InitClock(self):
+        """
+        The timing pulse gets exported to RTSI0 as trigger signal for the counter tasks and RTSI 2
+        for the analog output task.
+        """
+        self._freq = self._dict._a["laser frequency"]
+
         self._timingPuls = Task()
         self._timingPuls.CreateCOPulseChanFreq(counter="Dev1/ctr0",
                                                nameToAssignToChannel="",
@@ -35,8 +48,6 @@ class SampleClock():
         self._timingPuls.SetExportedCtrOutEventOutputBehavior(DAQmx_Val_Pulse)
 
     def startClock(self):
-        self._freq = self._dict._a.getitem("laser frequency")
-        self.Pulse()
         self._timingPuls.StartTask()
 
     def stopClock(self):

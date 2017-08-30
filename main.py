@@ -10,12 +10,16 @@
 # License: GPL3
 #####################################################################'''
 import sys
+
 from PyQt5.QtWidgets import QApplication
-import mainwindow as mw
 from multiprocessing import freeze_support
+
+import mainwindow as mw
 
 
 def main():
+    """Main class launches Mainwindow, freeze_support helps with maintaining multiprocessing"""
+
     app = QApplication(sys.argv)
     mainWindow = mw.MainWindow()
     # mainWindow.initUI()

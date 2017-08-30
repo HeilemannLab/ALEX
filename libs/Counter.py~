@@ -12,44 +12,44 @@
 import libs.APD
 import numpy as np
 from multiprocessing import Process
-import cProfile
 
 
 class Counter(Process):
+    """
+    The counter class is a multiprocessing.Process subclass. It's core functionalty is to start the measurement
+    via the APD class in a new process. The process is regulated from the main loop by the event variable
+    self._running.
+    """
     def __init__(self, running, dataQ, readArraySize, N):
+        """
+        @param running: multiprocessing event
+        @param dataQ: multiprocessing queue
+        @param readArraySize: int
+        @param: N: int
+        """
         super(Counter, self).__init__()
         self.daemon = True
         self._running = running
         self._dataQ = dataQ
         self._readArraySize = readArraySize
-        self._data = np.zeros([self._readArraySize, 2], dtype=int)    # this statement doesnt update arraySize otherwise
+        self._data = np.zeros([self._readArraySize, 2], dtype=int)
         self._N = N
         self._apd = libs.APD.TimestampingCounters(self._readArraySize, self._N)
 
-    """
-    def do_cprofile(func):
-        def profiled_func(*args, **kwargs):
-            profile = cProfile.Profile()
-            try:
-                profile.enable()
-                result = func(*args, **kwargs)
-                profile.disable()
-                return result
-            finally:
-                profile.print_stats()
-        return profiled_func
-    """
-
-    # @do_cprofile
     def run(self):
-        # run() is obligatory for subprocesses. Strangely it gets called by start()
-        # This function calls refresh functions, starts counting
+        """
+        run() is obligatory for subprocesses. Strangely it gets called by start().
+        This function calls refresh functions, starts counting.
+        """
         self._apd.startCounting()
         self.Measurement()
-        print("Counter %i sent all data and exits." % ((self._N)))
+        print("Counter %i sent all data and exits." % (self._N))
 
-    # @do_cprofile
     def Measurement(self):
+        """
+        Measurement is conducted as long as self._running is True. ReadAPD() delivers a return value,
+        therefore the splitting in two lines with the Q.put().
+        """
         while self._running.is_set():
             self._data = self._apd.readAPD()
             self._dataQ.put(self._data)
@@ -57,4 +57,4 @@ class Counter(Process):
         self._dataQ.put('STOP')
 
     def __del__(self):
-        print("Counter class instance %i has been removed." % ((self._N)))
+        print("Counter class instance %i has been removed." % (self._N))

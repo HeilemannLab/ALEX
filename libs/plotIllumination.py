@@ -15,24 +15,36 @@ import libs.dictionary
 # from matplotlib.backends.backend_pdf import PdfPages
 
 
-class plotIllumination():
+class plotIllumination:
+    """
+    This class is a simple print tool. It collects the laser settings and print a similar
+    plot to a .png file. This should be saved everytime a dataset from a measurement gets
+    saved.
+    """
     def __init__(self):
         self._dict = libs.dictionary.UIsettings()
         self._t = np.arange(0, 101, 1)
         self._green = np.zeros([101])
         self._red = np.zeros([101])
+        self._greenPercent = 0
+        self._greenAmp = 0
+        self._redAmp = 0
 
     def refreshSettings(self, dictionary):
         self._dict_a = dictionary
 
     def plot(self, fname):
-        self._greenPercent = self._dict.getitem("laser percentage1")
+        """
+        A plot similar to the digital laser signal combined with the laser power
+        gets created here and saved to .png file.
+        """
+        self._greenPercent = self._dict._a["laser percentage1"]
         print(self._greenPercent)
-        self._greenAmp = self._dict.getitem("lpower green")
-        self._redAmp = self._dict.getitem("lpower red")
+        self._greenAmp = self._dict._a["lpower green"]
+        self._redAmp = self._dict._a["lpower red"]
 
-        self._green[1:self._greenPercent + 1] = (self._greenAmp)
-        self._red[self._greenPercent + 1:-1] = (self._redAmp)
+        self._green[1:self._greenPercent + 1] = self._greenAmp
+        self._red[self._greenPercent + 1:-1] = self._redAmp
 
         plt.plot(self._t, self._green, linestyle='--', drawstyle='steps')
         plt.plot(self._t, self._red, linestyle='--', drawstyle='steps')

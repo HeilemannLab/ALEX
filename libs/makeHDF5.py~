@@ -28,18 +28,18 @@ class makeHDF5():
     def makeFile(self):
         timestamps = self._data         # data goes here, ndarray
         timestamps.sort()
-        timestamps_unit = self._dict["timestamps_unit"]     # 10 ns, units are always S.I.
+        timestamps_unit = self._dict.getitem("timestamps_unit")     # 10 ns, units are always S.I.
 
-        detectors = self._dict["detectors"]
+        detectors = self._dict.getitem("detectors")
 
-        description = self._dict["description"]
+        description = self._dict.getitem("description")
 
-        author = self._dict["author"]
-        author_affiliation = self._dict["author_affiliation"]
+        author = self._dict.getitem("author")
+        author_affiliation = self._dict.getitem("author_affiliation")
 
-        sample_name = self._dict["sample_name"]
-        buffer_name = self._dict["buffer_name"]
-        dye_names = self._dict["dye_names"]   # Comma separates names of fluorophores
+        sample_name = self._dict.getitem("sample_name")
+        buffer_name = self._dict.getitem("buffer_name")
+        dye_names = self._dict.getitem("dye_names")   # Comma separates names of fluorophores
 
         photon_data = dict(
             timestamps=timestamps,

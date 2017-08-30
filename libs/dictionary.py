@@ -1,6 +1,6 @@
 '''######################################################################
-# File Name:
-# Project: dictionary.py
+# File Name: dictionary.py
+# Project: ALEX
 # Version:
 # Creation Date: 2017/02/03
 # Created By: Karoline
@@ -12,16 +12,19 @@
 
 
 class UIsettings:
-
+    """
+    The UIsetting class host a dictionary which holds all the key parameters to the measurement.
+    Methods 'getitem' and 'setitem' are outdated.
+    """
     def __init__(self):
-        a = dict()
-        a["lpower red"] = 100.0
+        a = {}
+        a["lpower red"] = 50.0
         a["lpower green"] = 50.0
-        a["laser frequency"] = 1000.0
+        a["laser frequency"] = 10000.0
         a["Radio"] = 0
         a["Duration"] = 300
-        a["laser percentageG"] = 60
-        a["laser percentageR"] = 40
+        a["laser percentageG"] = 50
+        a["laser percentageR"] = 50
         self._folder = 'C:/'
         self._a = a
 

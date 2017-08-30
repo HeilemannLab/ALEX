@@ -15,7 +15,17 @@ import seaborn as sns
 
 
 class Animation():
+    """
+    Animation class is designed specially to make the matplotlib.animation.FuncAnimation method work.
+    The plots are Line2D graphs, also data can be plotted in two subplots,
+    or in one as it's usual for FRET.
+    """
     def __init__(self, animDataQ1, animDataQ2, signal):
+        """
+        :param animDataQ1: multiprocessing queue
+        :param animDataQ2: mulitprocessing queue
+        :param signal: class instance
+        """
         self._animDataQ1 = animDataQ1
         self._animDataQ2 = animDataQ2
         self._signal = signal
@@ -30,15 +40,20 @@ class Animation():
         self._axLimit = 1e8
 
     def run(self):
+        """To start animation a run method is necessary. Therefore it's most certainly a threading.Thread subclass."""
         self.plot()
 
     def plot(self):
+        """
+        This plot function provides one plot, where both datasets are plotted into. The red APD data is multiplied with -1.
+        The style is a seaborn one.
+        """
         # pyplot.style.use('seaborn-deep')
-        sns.set()
+        sns.set()   # seaborn plot style
         ax = self._figure.add_subplot(111)
 
-        self._greenLine = Line2D([], [], color='black')
-        self._redLine = Line2D([], [], color='black')
+        self._greenLine = Line2D([], [], color='green')
+        self._redLine = Line2D([], [], color='red')
 
         ax.add_line(self._greenLine)
         ax.add_line(self._redLine)
@@ -46,17 +61,18 @@ class Animation():
         ax.set_xlim(0, 10)
         ax.set_ylim(-self._axLimit, self._axLimit)
 
-        ax.set_xlabel("time in [s]")
-        ax.set_ylabel("counts")
+        ax.set_xlabel("time")
+        ax.set_ylabel("counts/sec")
 
     def plot2(self):
+        """This plot function provides two subplots with the red channel data on the second plotting it in negative direction."""
         pyplot.style.use('seaborn-deep')
 
         ax_green = self._figure.add_subplot(2, 1, 1)
         ax_red = self._figure.add_subplot(2, 1, 2)
 
-        self._greenLine = Line2D([], [], color='black')
-        self._redLine = Line2D([], [], color='black')
+        self._greenLine = Line2D([], [], color='green')
+        self._redLine = Line2D([], [], color='red')
 
         ax_green.add_line(self._greenLine)
         ax_red.add_line(self._redLine)
@@ -83,15 +99,26 @@ class Animation():
         return self._greenLine, self._redLine,
 
     def updateAnimation(self, i):
+        """
+        The data is retrieved from the queues in an try/except block to avoid errors/blocking.
+        In there also the signal 'displayRates' gets emitted with a two-item-list[green, red].
+        :param i: iterable
+        This parameter is necessary for the animation, it passes the 'frames' argument as an iterator somehow.
+        Documtation does not entirely reveal how this works.
+        """
         if self._tdata[-1] > 10:
             self._tdata = [0]
             self._greenData = [self._greenData[-1]]
             self._redData = [self._redData[-1]]
+        # This try/except section looks ugly, but it works good for unstable data influx.
+        # The print error statement in except can be neglected in real mesurements.
         try:
             green = float(1e8) * self._animDataQ1.get(timeout=1.0)
             red = float(1e8) * (-1) * self._animDataQ2.get(timeout=1.0)
-            x = [int(green), int(red)]
+            x = [int(green), int(-1 * red)]   # Do not know if the '- red' will actually work
             self._signal.displayRates.emit(x)
+            if (green >= 15000000.0) or ((-1 * red) >= 15000000.0):
+                self._signal.warning.emit()
 
             self._greenData.append(green)
             self._redData.append(red)
@@ -105,6 +132,9 @@ class Animation():
         return self._greenLine, self._redLine,
 
     def animate(self):
+        """
+        FuncAnimation updates #(frames), in #(interval) milliseconds. It's using blitting, therefore the axis will not get updated.
+        """
         self.anim = animation.FuncAnimation(self._figure, self.updateAnimation, init_func=self.initAnimation, frames=100, interval=100, blit=True, repeat=True)
         pyplot.show()
 

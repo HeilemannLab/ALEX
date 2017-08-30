@@ -53,12 +53,12 @@ class maskHDF5():
         line6 = QLineEdit()
         line6.setPlaceholderText("detailed description")
 
-        line1.textChanged.connect(lambda name, text: self._dict["author"]=text)
-        line2.textChanged.connect(lambda name, text: self._dict["author_affiliation"]=text)
-        line3.textChanged.connect(lambda name, text: self._dict["sample_name"]=text)
-        line4.textChanged.connect(lambda name, text: self._dict["buffer_name"]=text)
-        line5.textChanged.connect(lambda name, text: self._dict["dye_names"]=text)
-        line6.textChanged.connect(lambda name, text: self._dict["description"]=text)
+        line1.textChanged.connect(lambda name, text: self._dict["author"] = text)
+        line2.textChanged.connect(lambda name, text: self._dict["author_affiliation"] = text)
+        line3.textChanged.connect(lambda name, text: self._dict["sample_name"] = text)
+        line4.textChanged.connect(lambda name, text: self._dict["buffer_name"] = text)
+        line5.textChanged.connect(lambda name, text: self._dict["dye_names"] = text)
+        line6.textChanged.connect(lambda name, text: self._dict["description"] = text)
 
         saveButton = QPushButton("Save")
         saveButton.clicked.connect(self.saveFile)
