@@ -1,5 +1,5 @@
 '''######################################################################
-# File Name: maskForHDF5.py
+# File Name: HDFmask.py
 # Project: ALEX
 # Version:
 # Creation Date: 2017/04/11
@@ -9,29 +9,23 @@
 # Department: Single Molecule Biophysics
 # License: GPL3
 #####################################################################'''
-import libs.makeHDF5
-from PyQt5.QtWidgets import QWidget, QLineEdit, QLabel, QVBoxLayout, QPushButton, QApplication
-import sys
-import numpy as np
+from PyQt5.QtWidgets import QLineEdit, QLabel, QVBoxLayout, QPushButton, QDialog
 
 
-class maskHDF5():
+class HDFmask(QDialog):
     """
     This class provides a raw interface to fill in the measurement variables, which are needed to
     get a nice photon-HDF file, as it is desired by Fretbursts. This is not ready yet.
     """
-    def __init__(self, frequency, filename, data):
-        self._dict = {}    # empty dict
-        unit = 1e8
-        self._dict["timestamps_unit"] = unit
-        self._dict["author_affiliation"] = "Institute for Physical and Theoretical Chemistry, Goethe-University Frankfurt"
-        self._dict["detectors"] = "no idea"
-        self._filename = filename
-        self._data = data
-        self.maskWindow()
-
-    def maskWindow(self):
-        win = QWidget()
+    def __init__(self):
+        super(HDFmask, self).__init__()
+        self._dict = {"author_affiliation": "Institute for Physical and Theoretical Chemistry, Goethe-University Frankfurt",
+                      "author": "author name",
+                      "sample_name": "sampleX",
+                      "buffer_name": "buffer",
+                      "dye_names": "dye1, dye2",
+                      "description": "Experiment X",
+                      "num_dyes": int(2)}
 
         label1 = QLabel("author")
         label2 = QLabel("institute")
@@ -39,6 +33,7 @@ class maskHDF5():
         label4 = QLabel("buffer")
         label5 = QLabel("dyes")
         label6 = QLabel("description")
+        label8 = QLabel("number dyes")
 
         line1 = QLineEdit()
         line1.setPlaceholderText("Your name")
@@ -52,13 +47,16 @@ class maskHDF5():
         line5.setPlaceholderText("Dye names, separated by comma")
         line6 = QLineEdit()
         line6.setPlaceholderText("detailed description")
+        line8 = QLineEdit()
+        line8.setPlaceholderText("Number of dyes")
 
-        line1.textChanged.connect(lambda name, text: self._dict["author"]=text)
-        line2.textChanged.connect(lambda name, text: self._dict["author_affiliation"]=text)
-        line3.textChanged.connect(lambda name, text: self._dict["sample_name"]=text)
-        line4.textChanged.connect(lambda name, text: self._dict["buffer_name"]=text)
-        line5.textChanged.connect(lambda name, text: self._dict["dye_names"]=text)
-        line6.textChanged.connect(lambda name, text: self._dict["description"]=text)
+        line1.textChanged.connect(lambda: self.setitem("author", line1.text()))
+        line2.textChanged.connect(lambda: self.setitem("author_affiliation", line2.text()))
+        line3.textChanged.connect(lambda: self.setitem("sample_name", line3.text()))
+        line4.textChanged.connect(lambda: self.setitem("buffer_name", line4.text()))
+        line5.textChanged.connect(lambda: self.setitem("dye_names", line5.text()))
+        line6.textChanged.connect(lambda: self.setitem("description", line6.text()))
+        line8.textChanged.connect(lambda: self.setitem("num_dyes", int(line8.text())))
 
         saveButton = QPushButton("Save")
         saveButton.clicked.connect(self.saveFile)
@@ -72,28 +70,25 @@ class maskHDF5():
         vbox.addWidget(line3)
         vbox.addWidget(label4)
         vbox.addWidget(line4)
+        vbox.addWidget(label8)
+        vbox.addWidget(line8)
         vbox.addWidget(label5)
         vbox.addWidget(line5)
         vbox.addWidget(label6)
         vbox.addWidget(line6)
         vbox.addWidget(saveButton)
 
-        # group = QGroupBox()
-        # group.setLayout(vbox)
+        self.setLayout(vbox)
+        self.setWindowTitle("hdf5 mask")
 
-        # box = QVBoxLayout()
-        # box.addLayout(group)
-
-        win.setLayout(vbox)
-        win.setWindowTitle("hdf5 mask")
-        win.show()
+    def maskWindow(self):
+        self.exec_()
+        # self.show()
 
     def saveFile(self):
-        libs.makeHDF5.makeHDF5(self._dict, self._data, self._filename)
+        self.close()
+        # self.accept()
+        # self.done(0)
 
-if __name__ == '__main__':
-    data = np.zeros([4, 4])
-    app = QApplication(sys.argv)
-    maskHDF5(100, "test", data)
-    app.exec_()
-    sys.exit()
+    def setitem(self, key, value):
+        self._dict[key] = value

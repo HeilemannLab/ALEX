@@ -459,7 +459,6 @@ class MainWindow(QMainWindow):
             except:
                 pass
             self.startProcesses()
-            self.statusBar.showMessage("Started!")
         else:
             print("Already running!")
             self.statusBar.showMessage("Already running!")
@@ -472,6 +471,7 @@ class MainWindow(QMainWindow):
         self._anim = libs.Animation.Animation(self._animDataQ1, self._animDataQ2, self.signal)
         self._dataProcesser1 = libs.dataProcesser.DataProcesser(self._dataQ1, self._animDataQ1, self._readArraySize, 1)
         self._dataProcesser2 = libs.dataProcesser.DataProcesser(self._dataQ2, self._animDataQ2, self._readArraySize, 2)
+        self.statusBar.showMessage("Started!")
         self._anim.run()
         self._u = Thread(target=self.waitForIteration, args=(), name='iterator', daemon=True)
 
@@ -486,8 +486,11 @@ class MainWindow(QMainWindow):
 
     def waitForIteration(self):
         """
-        The first line 'time.sleep' is necessary to make sure, all the processes have been initialized and started before it starts the timing loop.
-        Although a pyqt Signal could provide more control. A semaphore lock could count down, and make exact timing maybe.
+        Illumination and APDs acquire the semaphore after initialization of tasks, the waiter waits for the semaphore to have its internal counter down to zero
+        (when als tasks are ready). Only then the waiter proceeds and does actually nothing (mode = 0 --> continuous mode) or starts the progressBar and timing
+        (mode 1 --> finite mode). In case of finite mode, the waiter stops the measurement after the duration elapses. In continuous mode, the measuremt  must
+        be stopped by the user In case of finite mode, the waiter stops the measurement after the duration elapses. In continuous mode, the measuremt  must
+        be stopped by the user..
         """
         while self._semaphore.get_value() > 0:
             pass
@@ -544,8 +547,8 @@ class MainWindow(QMainWindow):
             self._u.join(timeout=3.0)
             self._counter1.join(timeout=3.0)
             self._counter2.join(timeout=3.0)
-            self._dataProcesser1.join(timeout=3.0)
-            self._dataProcesser2.join(timeout=3.0)
+            self._dataProcesser1.join()
+            self._dataProcesser2.join()
             # extensive checking for joining
             if self._dataProcesser1.is_alive():
                 print("Processer 1 did not join.")

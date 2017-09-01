@@ -22,9 +22,9 @@ class Animation():
     """
     def __init__(self, animDataQ1, animDataQ2, signal):
         """
-        :param animDataQ1: multiprocessing queue
-        :param animDataQ2: mulitprocessing queue
-        :param signal: class instance
+        @param animDataQ1: multiprocessing queue
+        @param animDataQ2: mulitprocessing queue
+        @param signal: class instance
         """
         self._animDataQ1 = animDataQ1
         self._animDataQ2 = animDataQ2
@@ -102,7 +102,7 @@ class Animation():
         """
         The data is retrieved from the queues in an try/except block to avoid errors/blocking.
         In there also the signal 'displayRates' gets emitted with a two-item-list[green, red].
-        :param i: iterable
+        @param i: iterable
         This parameter is necessary for the animation, it passes the 'frames' argument as an iterator somehow.
         Documtation does not entirely reveal how this works.
         """

@@ -13,10 +13,11 @@ import os
 import time
 import numpy as np
 import tables
-from datetime import datetime
 import libs.dictionary
 import pickle
 import libs.plotIllumination
+import libs.HDFmask
+import libs.saveHDF
 
 
 class FileDialogue:
@@ -28,6 +29,8 @@ class FileDialogue:
     def __init__(self):
         self._dict = libs.dictionary.UIsettings()
         self._plot = libs.plotIllumination.plotIllumination()
+        self._mask = libs.HDFmask.HDFmask()
+        self._saveHDF = libs.saveHDF.saveHDF5()
         self._planet = 0
 
     def refreshSettings(self, dictionary):
@@ -42,12 +45,10 @@ class FileDialogue:
             self._dict._a = self.loadDict(filename)
             return self._dict._a
         else:
-            # filename = self.createFolder(filename)
             if keyword == 'save':
                 self.saveDict(filename)
             if keyword == 'txt':
                 pass
-                # self.saveDataToTxt(filename)
             elif keyword == 'hdf5':
                 self.saveDataToHDF5(filename)
             return None
@@ -61,57 +62,33 @@ class FileDialogue:
         filename = "tempAPD{}.hdf".format(N)
         f = tables.open_file(filename, 'a')
         f.root.timestamps[:, 0] = f.root.timestamps[:, 0] + (4294967296.0 * f.root.timestamps[:, 1])
-        f.flush()   # do not know yet why one needs that
+        f.flush()   # do not know yet why one needs that, maybe clears allocated RAM
         f.close()
         t_end = time.time()
         t = t_end - t_start
         print("Rollover %i correction took %f seconds" % (N, t))
 
-    def saveDataToTxt(self, filename):
-        """
-        Saves data to .txt file. But therefore the whole array would have to be read into the RAM,
-        which can cause severe problems. It's not completed yet.
-        """
-        self.correctRollover(1)
-        self.correctRollover(2)
-        """
-        if len(data1) >= len(data2):
-            data = np.zeros([len(data1), 2])
-            data[:, 0] = data1[:, 0]
-            data[0:len(data2), 1] = data2[:, 0]
-            print("more green or equal")
-        else:
-            data = np.zeros([len(data2), 2])
-            data[0:len(data1), 0] = data1[:, 0]
-            data[:, 1] = data2[:, 0]
-        """
-        data = [0]
-        header = str(datetime.now().strftime('%Y/%m/%d %H:%M:%S')
-                     + "\nDuration: "
-                     + str(self._dict._a["Duration"])
-                     + " sec\nLaser alternation frequency: "
-                     + str(self._dict._a["laser frequency"])
-                     + " Hz\nPercentage illumination green: "
-                     + str(self._dict._a["laser percentageG"])
-                     + "\nIter\tGreen channel\tRed channel")
-
-        if filename:
-            np.savetxt(filename, data, fmt='%i', delimiter='\t\t', header=header)
-        else:
-            print("Something wrong with the filename.")
-
     def saveDataToHDF5(self, filename):
         """
-        This method calls the rollover correction and currently reads the arrays into RAM in roder to apply
+        This method calls the rollover correction and currently reads the arrays into RAM in order to apply
         the 'merge_timestamps' method from Antonino Ingargiola. The merged dataset and the detector mask get
         then saved to another .hdf file.
         """
         if filename:
             # Save dict and alternation plot
-            self.saveDict(filename)
+            # self.saveDict(filename)
+            self._mask.maskWindow()
+            print(self._mask._dict)
+            self.addArrays(filename)
+
+        else:
+            print("No valid filename.")
+
+    def addArrays(self, filename):
             # Rollover correction
-            self.correctRollover(1)
-            self.correctRollover(2)
+            # self.correctRollover(1)
+            # self.correctRollover(2)
+
             # The arrays have to be written to the RAM, because currently the merging only happens
             # in the RAM, until there's a solution writing on the hdf files only.
             # array 1
@@ -119,30 +96,24 @@ class FileDialogue:
             rows1 = f1.root.timestamps[:, 0]
             f1.flush()
             f1.close()
+
             # array 2
             f2 = tables.open_file('tempAPD2.hdf', 'r')
             rows2 = f2.root.timestamps[:, 0]
             f2.flush()
             f2.close()
-            # new array
-            hour = '{:%H}'.format(datetime.now())
-            minute = '{:%M}'.format(datetime.now())
-            filename = "{}_{}_{}.hdf".format(filename, hour, minute)
-            data, detector_mask = self.merge_timestamps(rows1, rows2)
-            outFile = tables.open_file(filename, 'w')
-            # atom = tables.UInt32Atom()
-            filters = tables.Filters(complevel=6, complib='zlib')
-            # photon_data group, timestamps and detector mask array creation
-            outFile.create_group('/', 'photon_data')
-            outFile.create_carray(where='/photon_data', name='timestamps', obj=data, filters=filters)
-            outFile.create_carray(where='/photon_data', name='detectors', obj=detector_mask, filters=filters)
 
-            # here antoninos save photon thing can happen, it also works an opened file and existing tables.arrays
-            outFile.flush()
-            outFile.close()
-            print("Array stored, file closed")
-        else:
-            print("No valid filename.")
+            # merge the two arrays into one, create detector mask
+            data, detector_mask = self.merge_timestamps(rows1, rows2)
+
+            # open to append rest oft required dict and convert to photon-hdf5
+            self._mask._dict["timestamps_reference"] = data
+            self._mask._dict["detectors_reference"] = detector_mask
+            # self._mask._dict["acquisition_duration"] = self._dict._a["Duration"]
+
+            self._saveHDF.assembleDictionary(self._mask._dict)
+            self._saveHDF.saveAsHDF(filename)
+            print("Array stored")
 
     def merge_timestamps(self, t1, t2):
         """

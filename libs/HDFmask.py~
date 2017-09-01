@@ -1,5 +1,5 @@
 '''######################################################################
-# File Name: maskForHDF5.py
+# File Name: HDFmask.py
 # Project: ALEX
 # Version:
 # Creation Date: 2017/04/11
@@ -9,15 +9,16 @@
 # Department: Single Molecule Biophysics
 # License: GPL3
 #####################################################################'''
-from PyQt5.QtWidgets import QWidget, QLineEdit, QLabel, QVBoxLayout, QPushButton
+from PyQt5.QtWidgets import QLineEdit, QLabel, QVBoxLayout, QPushButton, QObject
 
 
-class maskHDF5():
+class HDFmask(QObject):
     """
     This class provides a raw interface to fill in the measurement variables, which are needed to
     get a nice photon-HDF file, as it is desired by Fretbursts. This is not ready yet.
     """
     def __init__(self):
+        super(HDFmask, self).__init__()
         self._dict = {"author_affiliation": "Institute for Physical and Theoretical Chemistry, Goethe-University Frankfurt",
                       "author": "author name",
                       "sample_name": "sampleX",
@@ -25,10 +26,6 @@ class maskHDF5():
                       "dye_names": "dye1, dye2",
                       "description": "Experiment X",
                       "num_dyes": int(2)}
-
-    def maskWindow(self, filename):
-        self._dict["filename"] = filename
-        self._win = QWidget()
 
         label1 = QLabel("author")
         label2 = QLabel("institute")
@@ -81,11 +78,17 @@ class maskHDF5():
         vbox.addWidget(line6)
         vbox.addWidget(saveButton)
 
-        self._win.setLayout(vbox)
-        self._win.setWindowTitle("hdf5 mask")
-        self._win.show()
+        self.setLayout(vbox)
+        self.setWindowTitle("hdf5 mask")
 
-        return self._dict
+    def maskWindow(self):
+        self.exec_()
+        # self.show()
+
+    def saveFile(self):
+        self.close()
+        # self.accept()
+        # self.done(0)
 
     def setitem(self, key, value):
         self._dict[key] = value

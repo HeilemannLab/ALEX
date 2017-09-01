@@ -102,7 +102,7 @@ class Animation():
         """
         The data is retrieved from the queues in an try/except block to avoid errors/blocking.
         In there also the signal 'displayRates' gets emitted with a two-item-list[green, red].
-        :param i: iterable
+        @param i: iterable
         This parameter is necessary for the animation, it passes the 'frames' argument as an iterator somehow.
         Documtation does not entirely reveal how this works.
         """
@@ -115,8 +115,10 @@ class Animation():
         try:
             green = float(1e8) * self._animDataQ1.get(timeout=1.0)
             red = float(1e8) * (-1) * self._animDataQ2.get(timeout=1.0)
-            x = [int(green), int(-red)]   # Do not know if the '- red' will actually work
+            x = [int(green), int(-1 * red)]   # Do not know if the '- red' will actually work
             self._signal.displayRates.emit(x)
+            if (green >= 15000000.0) or ((-1 * red) >= 15000000.0):
+                self._signal.warning.emit()
 
             self._greenData.append(green)
             self._redData.append(red)

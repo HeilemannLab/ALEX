@@ -38,10 +38,10 @@ class plotIllumination:
         A plot similar to the digital laser signal combined with the laser power
         gets created here and saved to .png file.
         """
-        self._greenPercent = self._dict.getitem("laser percentage1")
+        self._greenPercent = self._dict._a["laser percentageG"]
         print(self._greenPercent)
-        self._greenAmp = self._dict.getitem("lpower green")
-        self._redAmp = self._dict.getitem("lpower red")
+        self._greenAmp = self._dict._a["lpower green"]
+        self._redAmp = self._dict._a["lpower red"]
 
         self._green[1:self._greenPercent + 1] = self._greenAmp
         self._red[self._greenPercent + 1:-1] = self._redAmp

@@ -23,9 +23,9 @@ class Refresh:
     def refreshUI(self, changeType, changeKey, value):
         """
         Sorts the type of change, passes changeKey and value
-        :param changeType: str
-        :param changeKey: Key
-        :param value: int or float
+        @param changeType: str
+        @param changeKey: Key
+        @param value: int or float
         """
         if changeType == 0:
             self.refreshSliderSettings(changeKey, value)

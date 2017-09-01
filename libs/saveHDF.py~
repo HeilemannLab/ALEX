@@ -1,5 +1,5 @@
 '''######################################################################
-# File Name: makeHDF5.py
+# File Name: saveHDF5.py
 # Project: ALEX
 # Version:
 # Creation Date: 2017/04/11
@@ -10,25 +10,36 @@
 # License: GPL3
 #####################################################################'''
 import phconvert as phc
-import numpy as np
+# import numpy as np
 
 
-class makeHDF5:
+class saveHDF5:
     """
     This class should serve as tool to create a fully functional photon-HDF file. It is based upon
     the notebook example from phconvert by Antonino Ingargiola, but slightly changed. The data, specs
     and attributes are organized in dictionaries. those will be transormed into 'groups' in the hdf5 file.
-    The main method 'save_photon_hdf5' is stated to be applicable to an open hdf-file. Last the file gets
+    The main method 'save_photon_hdf5' is stated to be applicable to an open hdf-file. Lastly the file gets
     checked by 'assert_valid_photon_hdf5' method.
     """
-    def __init__(self):
-        self._planet = 0
-
-    def makeFile(self, dictionary):
-        # Dummy data
-        timestamps = np.zeros([10])
-        detectors = np.zeros([10])
-        timestamps_unit = int(1e-8)
+    def assembleDictionary(self, dictionary):
+        self._dictionary = dictionary
+        """
+        Note to 'save_photon_hdf' method:
+        The argument 'h5file' accepts an already open HDF5 file for storage.
+        This allows completing a partially written file (for example
+        containing only photon_data arrays) or correcting and already complete
+        Photon-HDF5 file. When using 'h5file', you need to pass a full
+        'data_dict' structure as usual. If you don't want update an array,
+        put in 'data_dict' a reference to the existing pytables array
+        (instead of using a numpy array). Fields containing numpy arrays
+        will be overwritten. Fields containing pytables Array (including
+        CArray or EArray) will be left unmodified. In either cases the TITLE
+        attribute is always updated.
+        """
+        # Data references from the open file
+        timestamps = self._dictionary["timestamps_reference"]
+        detectors = self._dictionary["detectors_reference"]
+        timestamps_unit = int(10**(-8))
         # Measurements specs to go into photon data group
         measurement_specs = dict(measurement_type='smFRET-usALEX',
                                  alex_period=4000,
@@ -58,27 +69,31 @@ class makeHDF5:
         provenance = dict(filename='raw data',
                           software='')
 
-        identity = dict(author=dictionary["author"],
-                        author_affiliation=dictionary["author_affiliation"])
+        identity = dict(author=self._dictionary["author"],
+                        author_affiliation=self._dictionary["author_affiliation"])
 
-        sample = dict(num_dyes=dictionary["num_dyes"],                  # (integer) number of different dyes present in the samples.
-                      dye_names=dictionary["dye_names"],                # (string) comma-separated list of dye or fluorophore names (for example: "ATTO550, ATTO647N")
-                      buffer_name=dictionary["buffer_name"],            # (string) a user defined description for the buffer.
-                      sample_name=dictionary["sample_name"])            # (string) a user defined description for the sample.
+        sample = dict(num_dyes=self._dictionary["num_dyes"],                  # (integer) number of different dyes present in the samples.
+                      dye_names=self._dictionary["dye_names"],                # (string) comma-separated list of dye or fluorophore names (for example: "ATTO550, ATTO647N")
+                      buffer_name=self._dictionary["buffer_name"],            # (string) a user defined description for the buffer.
+                      sample_name=self._dictionary["sample_name"])            # (string) a user defined description for the sample.
 
         # Here the dicts get assembled into one, so the hierarchical structure is formed
-        data = dict(description=dictionary["description"],
-                    setup=setup,
-                    photon_data=photon_data,
-                    identity=identity,
-                    provenance=provenance,
-                    sample=sample)
+        self._data = dict(description=self._dictionary["description"],
+                          # acquisition_duration=self._dictionary["acquisition_duration"],
+                          setup=setup,
+                          photon_data=photon_data,
+                          identity=identity,
+                          provenance=provenance,
+                          sample=sample)
 
+    def saveAsHDF(self, filename):
         # save in photon-hdf5 file
-        phc.hdf5.save_photon_hdf5(data_dict=data,
-                                  h5_fname=dictionary["filename"],
+        phc.hdf5.save_photon_hdf5(data_dict=self._data,
+                                  h5_fname=filename,
                                   overwrite=False)
+        print("Saved.")
 
         # check the new file
-        # filename = str(dictionary["filename"] + '.hdf5')
-        phc.hdf5.assert_valid_photon_hdf5(dictionary["filename"])
+        # filename = str(self._dictionary["filename"] + '.hdf5')
+        phc.hdf5.assert_valid_photon_hdf5(filename)
+        print("Checked.")
