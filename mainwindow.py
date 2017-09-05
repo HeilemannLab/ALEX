@@ -388,10 +388,11 @@ class MainWindow(QMainWindow):
         filename = QFileDialog.getSaveFileName(self, 'File dialogue', f)
         self._files.refreshSettings(self._dict._a)
         new_dict = self._files.SortTasks(keyword, filename[0])
+        self.statusBar.showMessage("Wait until data is processed!")
         if new_dict is not None:
             self._dict._a = new_dict
             self.refreshAll()
-        self.statusBar.showMessage("Beware that only data from finite measurements can be saved. Don't change parameters during a measurement!")
+        self.statusBar.showMessage("Data saved!")
 
     def closeApplication(self):
         """Close the app and animation window via file menue."""
@@ -543,12 +544,13 @@ class MainWindow(QMainWindow):
             while not self._semaphore.get_value() == 3:
                 self._semaphore.release()
             # joining
+            self.statusBar.showMessage("Stopped! Please wait while data is processed.")
             self._laser.join(timeout=3.0)
             self._u.join(timeout=3.0)
-            self._counter1.join(timeout=3.0)
-            self._counter2.join(timeout=3.0)
-            self._dataProcesser1.join()
-            self._dataProcesser2.join()
+            self._counter1.join(timeout=10.0)
+            self._counter2.join(timeout=10.0)
+            self._dataProcesser1.join(10.0)
+            self._dataProcesser2.join(10.0)
             # extensive checking for joining
             if self._dataProcesser1.is_alive():
                 print("Processer 1 did not join.")
@@ -570,7 +572,7 @@ class MainWindow(QMainWindow):
                 del self._laser
             else:
                 print("All workers have joined.")
-            self.statusBar.showMessage("Stopped!")
+            self.statusBar.showMessage("Stopped and idle!")
         else:
             print("not running at all!")
             self.statusBar.showMessage("Already stopped")

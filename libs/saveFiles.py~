@@ -119,7 +119,8 @@ class FileDialogue:
         """
         This method merges the timestamp arrays into one, so it fits to the needs of Fretbursts. In order
         to maintain the information, which item came from which detector a detector mask is created, which
-        also can be fed to Fretbursts.
+        also can be fed to Fretbursts. Returns two ndarrays with sorted timestamps 'tm' and detector ID mask
+        'mask_t2'.
         @param t1: ndarray
         @param t2: ndarray
         """
