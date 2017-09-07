@@ -22,7 +22,7 @@ class Sort_Test:
     def __init__(self):
         self._planet = 0
 
-    def openFiles(self):
+    def mergesort_hdf(self):
         # file 1, apd1
         self.f1 = tables.open_file('tempAPD1.hdf', 'r')
 
@@ -52,6 +52,7 @@ class Sort_Test:
         ts_table.append(self.f1.root.timestamps[:, 0])
         ts_table.append(self.f2.root.timestamps[:, 0])
         ts_table.cols._f_col('X').create_csindex()
+        print('index: ', ts_table.cols._f_col('X').index)
         ts_table.flush()
         end = time.time()
         print("Creating and indexing timestamps table took %f seconds." % (end - start))
@@ -67,19 +68,14 @@ class Sort_Test:
         det_table.append(det1)
         det_table.append(det2)
         det_table.flush()
-        detectors = self.f3.create_earray('/photon_data',
-                                          'detectors',
-                                          filters=self.filters,
-                                          shape=(0, 1),
-                                          atom=tables.Float64Atom())
         end = time.time()
         print("Creating detectors table took %f seconds." % (end - start))
 
-        # copy both tables with in sorted way
+        # copy both tables in sorted way
         start = time.time()
-        for row in det_table.itersorted(ts_table.cols._f_col('X')):
-            # print("Got %i of type %s" % (row.__getitem__('X'), type(row.__getitem__('X'))))
-            detectors.append(int(row.__getitem__('X')))
+        det_table.copy(newparent='/photon_data',
+                       newname='detectors',
+                       sortby=ts_table.cols._f_col('X'))
         end = time.time()
         print("Copying tables in sorted manner took %f seconds." % (end - start))
 
@@ -99,4 +95,4 @@ class Sort_Test:
     """
 if __name__ == '__main__':
     a = Sort_Test()
-    a.openFiles()
+    a.mergesort_hdf()
