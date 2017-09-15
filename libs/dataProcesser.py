@@ -43,6 +43,7 @@ class DataProcesser(Process):
         DataQ sends a string sentinel, first and last array entry get corrected by rollover count.
         Count rate entry/dt is send via animDataQ and lcdQ. Array gets appended to hdf file array, stored as temp.
         """
+        int_max = (2**32) - 1
         filename = "tempAPD{}.hdf".format(self._N)
         f = tables.open_file(filename, mode='w')
         atom = tables.UInt32Atom()
@@ -50,8 +51,8 @@ class DataProcesser(Process):
         timestamps = f.create_earray(f.root, 'timestamps', atom=atom, shape=(0, 2), filters=filters)
         for array in iter(self._dataQ.get, 'STOP'):
             timestamps.append(array)
-            n1 = array[0, 0] + (4294967296.0 * array[0, 1])
-            n2 = array[-1, 0] + (4294967296.0 * array[-1, 1])
+            n1 = array[0, 0] + (int_max * array[0, 1])
+            n2 = array[-1, 0] + (int_max * array[-1, 1])
             self._animDataQ.put(self._readArraySize / (n2 - n1))
         f.flush()
         f.close()
