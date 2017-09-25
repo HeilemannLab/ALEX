@@ -14,17 +14,18 @@ from matplotlib.lines import Line2D
 import seaborn as sns
 
 
-class Animation():
+class Animation:
     """
     Animation class is designed specially to make the matplotlib.animation.FuncAnimation method work.
-    The plots are Line2D graphs, also data can be plotted in two subplots,
-    or in one as it's usual for FRET.
+    The plots are Line2D graphs, also data can be plotted in two subplots ('plot2'),
+    or in one ('plot') as it's usual for FRET. The 'upfateAnimation' also feeds data to the LCD Panels
+    in the mainwindow via pyqtSignal.
     """
     def __init__(self, animDataQ1, animDataQ2, signal):
         """
-        :param animDataQ1: multiprocessing queue
-        :param animDataQ2: mulitprocessing queue
-        :param signal: class instance
+        @param animDataQ1: multiprocessing queue
+        @param animDataQ2: mulitprocessing queue
+        @param signal: class instance
         """
         self._animDataQ1 = animDataQ1
         self._animDataQ2 = animDataQ2
@@ -94,6 +95,11 @@ class Animation():
         self._figure.subplots_adjust(left=0.2, bottom=0.1, right=0.8, top=0.9, wspace=0.1, hspace=0.8)
 
     def initAnimation(self):
+        """
+        'initAnimation' creates the initial Window for the 'funcAnimation' method.
+        It it passed as a parameter, but it's optional, so this can be skipped.
+        But note that the LinePlot has to be initialized then otherwise.
+        """
         self._greenLine.set_data([], [])
         self._redLine.set_data([], [])
         return self._greenLine, self._redLine,
@@ -117,7 +123,7 @@ class Animation():
             red = float(1e8) * (-1) * self._animDataQ2.get(timeout=1.0)
             x = [int(green), int(-1 * red)]   # Do not know if the '- red' will actually work
             self._signal.displayRates.emit(x)
-            if (green >= 15000000.0) or ((-1 * red) >= 15000000.0):
+            if (green >= 15000000) or ((-1 * red) >= 15000000):
                 self._signal.warning.emit()
 
             self._greenData.append(green)

@@ -9,10 +9,10 @@
 # Department: Single Molecule Biophysics
 # License: GPL3
 #####################################################################'''
-from PyQt5.QtWidgets import QLineEdit, QLabel, QVBoxLayout, QPushButton, QObject
+from PyQt5.QtWidgets import QLineEdit, QLabel, QVBoxLayout, QPushButton, QDialog
 
 
-class HDFmask(QObject):
+class HDFmask(QDialog):
     """
     This class provides a raw interface to fill in the measurement variables, which are needed to
     get a nice photon-HDF file, as it is desired by Fretbursts. This is not ready yet.
@@ -79,11 +79,16 @@ class HDFmask(QObject):
         vbox.addWidget(saveButton)
 
         self.setLayout(vbox)
-        self.setWindowTitle("hdf5 mask")
+        self.setWindowTitle("Additional measurements informations")
 
-    def maskWindow(self):
+    def maskWindow(self, dictionary=None):
+        if dictionary is None:
+            pass
+        else:
+            self._dict.update(dictionary)
         self.exec_()
         # self.show()
+        return self._dict
 
     def saveFile(self):
         self.close()

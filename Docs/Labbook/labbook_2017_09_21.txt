@@ -1,0 +1,14 @@
+#### Labbook entry 21.09.2017
+
+Aufgaben:
+
+1. Umstrukturierung der file 'save' Funktion, nur noch die tempFiles speichern mit user-def Namen + Datum + Uhrzeit
+2. 
+
+Ergebnis:
+
+zu 1.
+ 
+* User gibt einen path vor
+* Save option vor dem Starten der Messung geplant  
+ 

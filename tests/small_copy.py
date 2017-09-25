@@ -22,9 +22,9 @@ def small_copy():
     t1 = f1.root.timestamps
 
     f1_copy = tables.open_file('tempAPD1_copy.hdf', 'w')
-    t1_copy = f1_copy.create_carray(f1_copy.root, name='timestamps', atom=atom, shape=(100000, 2), filters=filters)
+    t1_copy = f1_copy.create_carray(f1_copy.root, name='timestamps', atom=atom, shape=(100, 2), filters=filters)
 
-    t1_copy[0:100000, :] = t1[0:100000, :]
+    t1_copy[0:100, :] = t1[0:100, :]
 
     f1.close()
     f1_copy.close()
@@ -36,9 +36,9 @@ def small_copy():
     t2 = f2.root.timestamps
 
     f2_copy = tables.open_file('tempAPD2_copy.hdf', 'w')
-    t2_copy = f2_copy.create_carray(f2_copy.root, name='timestamps', atom=atom, shape=(100000, 2), filters=filters)
+    t2_copy = f2_copy.create_carray(f2_copy.root, name='timestamps', atom=atom, shape=(100, 2), filters=filters)
 
-    t2_copy[0:100000, :] = t2[0:100000, :]
+    t2_copy[0:100, :] = t2[0:100, :]
 
     f2.close()
     f2_copy.close()

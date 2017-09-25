@@ -1,0 +1,47 @@
+2017/04/06
+
+git version: 05.04.2017
+
+change:
++ try apd-count-animation first
++ find max value
+
+result:
++ ok
+
+change:
++ verschiedene heights der peaks
+
+result:
++ kein update der achsen
+
+change:
++ lcd number in mainwindow integriert
++ zu anim_processless übergeben
++ als signal emittiert
+
+result:
++ alles ok, aber keine lcd updates
+
+change:
++ nur ein signal
+
+result:
++ kein signal
+
+change:
++ try/except struktur
+
+result:
++ no signal
++ keine anzeige auf dem plot mehr, nur nullen
+
+change:
++ queue.clear() und queue.empty()
+
+result:
++ nicht möglich, weil queue nie empty
+
+change:
++ kill queues
++ 

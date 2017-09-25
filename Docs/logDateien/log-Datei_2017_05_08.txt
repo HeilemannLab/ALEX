@@ -1,0 +1,73 @@
+2017/05/08
+
+git version: 03.05.2017
+
+result:
++ 100kHz measurement doenst work
+
+change:
++ queueG and queueR in animation without timeout
+
+result:
++ kein error, aber viel zu langsam
++ stopping ok, stop and data sent
++ freezes and no data received
+
+change:
++ in wait funtkionen auch kein timeout
+
+result:
++ messung möglich, sehr langsam, keine daten received
+
+change:
++ timeout in wait und animation aus 1s
+
+result:
++ genauso
+
+change:
++ iteration wird nur in 10hz rate gesendet
+
+result:
++ genauso, kein statusbar, kein freeze am ende finite
+
+change:
++ alle timeouts auf 0.1s
+
+result:
++ 1kHz ok, 10kHz naja, 100kHz kaum möglich, aber kein freeze, data immer received
++ kein progressbar
+
+change:
++ queueI bei jeder iteration senden
+
+result:
++ möglich, aber viel zu langsam
+
+change:
++ timeouts in animation auf 0.01
+
+result:
++ genau nur mehr error messages
+
+change:
++ timeouts in animation auf 0.1
++ timeout in wait in mainwindow auf 0.01
+
+result:
++ 1kHz und 10kHz in ordnung, 100kHz nach wie vor zu langsam
+
+change:
++ if, elif else: pass in counter
+
+result:
++ same as before
+
+change:
++ condition für queues in counter: animrate = iteration, animrate += animrate1
+
+result:
++ slightly better, not yet satisfying
+
+change:
++ 

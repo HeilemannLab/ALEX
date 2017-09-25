@@ -39,7 +39,6 @@ class plotIllumination:
         gets created here and saved to .png file.
         """
         self._greenPercent = self._dict._a["laser percentageG"]
-        print(self._greenPercent)
         self._greenAmp = self._dict._a["lpower green"]
         self._redAmp = self._dict._a["lpower red"]
 

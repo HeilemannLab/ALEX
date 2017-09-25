@@ -1,0 +1,81 @@
+2017/07/26
+
+git version: no git
+
+result:
++ continuous mode ok, not joined at the end
++ very slow
+
+change:
++ exit with x button must be more competent
++ write function "closeEvent", maybe default?
+
+result:
++ closeEvent(self, event) works great, even without signal connection
++ finite can be restarted
++ still everythings slow
+
+change:
++ check analog signals
+
+result:
++ analog and laser signal not there when times really short, such as 10 seconds
++ means, the signal is not there immediately. the duration and the actual illumination dont match
+
+change:
++ use resultQ1 to send a Start message, timeout is 2 secs, since this takes much time
++ message is send after all processes called to start, so the waiter will continue with timing only if theres the signal
++ maybe timeout isnt enough
+
+result:
++ continuous ok
++ finite doesnt stop
+
+
+change:
++ else structure changed, else as optional ending for the for loop, and a else to the if message == start
+
+result:
++ continuous and finite 30s worked well, minor irregularities
++ finite 10s just doesnt start
++ no else-print "No start message received", so it was there
+
+change:
++ try to put the queue.put command before self._anim.animate() since this command is likely to cause problems. mostly it delayes everythings startet after it
+
+result:
++ no start message received with an 30s measurement, this means we could see it before
++ maybe timeout isnt enough
+
+change:
++ increase timeout to 3s
+
+result:
++ continuous ok
++ no start message received but the measurement starts either way (of course)
+
+change:
++ timeout in get inceased to 5 secs
++ add to print(no message) a stopMeasurement signal to prevent running measurement without specified duration
+
+result:
++ continuous ok, but hangs akwardly
++ finite 30s says elementwise comparison not possible, so theres it. this if statement cant be executed
++ exact timing not possible
+
+change:
++ try to thread only the timing
++ all processes get started and only in finite mode a signal is emitted to start the timing
++ all of it is back into startBtn function
+
+result:
++ timing is better, but either way too fast
++ time.sleep() delays it, but not exactly the amount of time the processes need to initialize
+
+change:
++ give the lcd numbers another try
++ signal from animation
++ setNumDigits to 12
+
+result:
++ seems to work

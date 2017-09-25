@@ -1,0 +1,29 @@
+'''######################################################################
+# File Name:
+# Project:
+# Version:
+# Creation Date:
+# Created By:
+# Company: Goethe University of Frankfurt
+# Institute: Institute of Physical and Theoretical Chemistry
+# Department: Single Molecule Biophysics
+# License: GPL3
+#####################################################################'''
+# import numpy
+import fib2
+print(fib2.fib.__doc__)
+
+
+# a = numpy.zeros(8, 'd')
+# fib1.fib(a)
+# print(a)
+i = 2
+j = 2
+t1 = 1
+t2 = 3
+check = 0
+t = 0
+f1 = 4
+f2 = 4
+fib2.fib(i, j, t1, t2, check, t, f1, f2)
+print('i=%i, j=%i, t=%i (should be 1)' % i, j, t)

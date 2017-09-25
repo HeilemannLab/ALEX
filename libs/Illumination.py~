@@ -42,6 +42,10 @@ class Illumination:
         self._sil2 = None
 
     def refreshSettings(self, dictionary):
+        """
+        refreshes settings of this class and of the SignalIntensity class.
+        @param dictionary: dict
+        """
         self._dict._a.update(dictionary)
         self._analog.refreshSettings(self._dict._a)
 
@@ -51,7 +55,7 @@ class Illumination:
         signal perfectly. A high and a low Time can be configured, so an initial delay can, which make the alternation
         possible. All values are in seconds (As far as nidaqmx documentation states, there's no smaller possibility).
         The digital signal does not take into account at which power percentage the lasers should be operated.
-        The height of the signal is 5V(TTL). The silencer runs at doubled frequency, so the APDs get muted on all 
+        The height of the signal is 5V(TTL). The silencer runs at doubled frequency, so the APDs get muted on all
         transitions from laser to laser.
         """
         self._percentHighGreen = (self._dict._a["laser percentageG"] / 100.0)
@@ -64,12 +68,12 @@ class Illumination:
         self._highSil = (1.0 / self._frequency) - (self._lowSil)
         self._initialDelay_sil1 = (0.4 * self._lowSil)
         self._initialDelay_sil2 = self._initialDelay_sil1 + self._highTime
-        # add comment
 
     def InitIllumination(self):
         """
-        The counter output tasks are configured as PulseChanTime, which is fairly flexible. The tasks are triggered by an ArmStartTrigger,
-        which makes it wait for the next trigger edge. Also the analog signal gets started here. The semaphore indicates, that initiation
+        The counter output tasks are configured as PulseChanTime, which is fairly flexible.
+        The tasks are triggered by an ArmStartTrigger, which makes it wait for the next trigger
+        edge. Also the analog signal gets started here. The semaphore indicates, that initiation
         is done.
         """
         self.calcSignal()
@@ -119,41 +123,44 @@ class Illumination:
         self._sem.acquire()
 
     def startIllumination(self):
+        """
+        Inits the digital tasks, start analogue signal and after that starts digital tasks.
+        """
         self.InitIllumination()
         self._analog.startAnalog()
 
         self._green.StartTask()
         self._red.StartTask()
         self._sil.StartTask()
-        # self._sil2.StartTask()
+        self._sil2.StartTask()
 
     def triggerIllumination(self):
-        """ArmStartTrigger for all tasks, source from RTSI0, which is provided by the timing class."""
+        """ArmStartTrigger for all tasks. Source from RTSI0, which is provided by the timing class."""
         self._green.SetArmStartTrigType(data=DAQmx_Val_DigEdge)
         self._red.SetArmStartTrigType(data=DAQmx_Val_DigEdge)
         self._sil.SetArmStartTrigType(data=DAQmx_Val_DigEdge)
-        # self._sil2.SetArmStartTrigType(data=DAQmx_Val_DigEdge)
+        self._sil2.SetArmStartTrigType(data=DAQmx_Val_DigEdge)
 
         self._green.SetDigEdgeArmStartTrigEdge(data=DAQmx_Val_Rising)
         self._red.SetDigEdgeArmStartTrigEdge(data=DAQmx_Val_Rising)
         self._sil.SetDigEdgeArmStartTrigEdge(data=DAQmx_Val_Rising)
-        # self._sil2.SetDigEdgeArmStartTrigEdge(data=DAQmx_Val_Rising)
+        self._sil2.SetDigEdgeArmStartTrigEdge(data=DAQmx_Val_Rising)
 
         self._green.SetDigEdgeArmStartTrigSrc(data="/Dev2/RTSI0")
         self._red.SetDigEdgeArmStartTrigSrc(data="/Dev2/RTSI0")
         self._sil.SetDigEdgeArmStartTrigSrc(data="/Dev2/RTSI0")
-        # self._sil2.SetDigEdgeArmStartTrigSrc(data="/Dev2/RTSI0")
+        self._sil2.SetDigEdgeArmStartTrigSrc(data="/Dev2/RTSI0")
 
     def stopIllumination(self):
         """Stops analog and digital laser signals."""
         self._green.StopTask()
         self._red.StopTask()
         self._sil.StopTask()
-        # self._sil2.StopTask()
+        self._sil2.StopTask()
 
         self._green.ClearTask()
         self._red.ClearTask()
         self._sil.ClearTask()
-        # self._sil2.ClearTask()
+        self._sil2.ClearTask()
 
         self._analog.stopAnalog()

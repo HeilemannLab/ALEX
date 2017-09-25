@@ -17,8 +17,9 @@ import tables
 class DataProcesser(Process):
     """
     The dataProcesser class is a subclass of multiprocessing.Process. It's main function is to process data
-    in rates for animation and to write it into a hdf5 file. The hdf format is accessed by the pytables library,
+    in rates for animation and to write it into an hdf5 file. The hdf format is accessed by the pytables library,
     and features fast write rates and good compression. So overfilling the RAM is avoided and the data is secured.
+    The files get stored in a loaction specified by the user.
     """
     def __init__(self, dataQ, animDataQ, readArraySize, N):
         """
@@ -44,7 +45,7 @@ class DataProcesser(Process):
         Count rate entry/dt is send via animDataQ and lcdQ. Array gets appended to hdf file array, stored as temp.
         """
         int_max = (2**32) - 1
-        filename = "tempAPD{}.hdf".format(self._N)
+        filename = "smALEX_APD{}.hdf".format(self._N)
         f = tables.open_file(filename, mode='w')
         atom = tables.UInt32Atom()
         filters = tables.Filters(complevel=6, complib='zlib')

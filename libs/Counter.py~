@@ -20,11 +20,12 @@ class Counter(Process):
     via the APD class in a new process. The process is regulated from the main loop by the event variable
     self._running.
     """
-    def __init__(self, running, dataQ, readArraySize, N):
+    def __init__(self, running, dataQ, readArraySize, semaphore, N):
         """
         @param running: multiprocessing event
         @param dataQ: multiprocessing queue
         @param readArraySize: int
+        @param semaphore: multiprocessing Semaphore
         @param: N: int
         """
         super(Counter, self).__init__()
@@ -33,8 +34,9 @@ class Counter(Process):
         self._dataQ = dataQ
         self._readArraySize = readArraySize
         self._data = np.zeros([self._readArraySize, 2], dtype=int)
+        self._sem = semaphore
         self._N = N
-        self._apd = libs.APD.TimestampingCounters(self._readArraySize, self._N)
+        self._apd = libs.APD.TimestampingCounters(self._readArraySize, self._N, self._sem)
 
     def run(self):
         """

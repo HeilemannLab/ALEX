@@ -1,0 +1,36 @@
+2017/04/25
+
+git version: 24.04.2017
+
+change:
++ edge trigger mit "ctr0out"
+
+result:
++ trig type not supoorted or not applicable
+
+change:
++ change samplclk "ctr0"
+
+result:
++ not supported
+
+change:
++ write example Cont Write Dig Port-Ext Clk
+
+result:
++ not working, also error at sample clock
+
+change:
++ writedigitallines
+
+result:
++ same
+
+change:
++ task.setTimingType(DAQmx_Val_OnDemand)
+
+result:
++ ok aber kein trigger möglich, kein signal auf dem oszi
+
+change:
++ correlated do ao task

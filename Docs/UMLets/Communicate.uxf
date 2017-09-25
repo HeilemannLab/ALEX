@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>20</x>
+      <y>20</y>
+      <w>240</w>
+      <h>160</h>
+    </coordinates>
+    <panel_attributes>Communicate
+PyQt5.QtCore.QObject
+mainwindow.py
+--
+- measurementProgress: pyqtSignal
+- startMeasurement: pyqtSignal
+- stopMeasurement: pyqtSignal
+- warning: pyqtSignal
+- displayRates: pyqtSignal
+--
+- init()</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>

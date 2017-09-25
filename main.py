@@ -22,7 +22,6 @@ def main():
 
     app = QApplication(sys.argv)
     mainWindow = mw.MainWindow()
-    # mainWindow.initUI()
     mainWindow.show()
     sys.exit(app.exec_())
 

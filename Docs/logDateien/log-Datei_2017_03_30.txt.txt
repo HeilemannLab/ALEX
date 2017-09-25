@@ -1,0 +1,272 @@
+2017/03/30
+
+erste version:
+git hard reset zum 28.03.2017
+
+result:
++ continuous ok
++ zweiter run daqmx error -50103, kein exit des programms, kein ctrl+c möglich
+
+change:
++ mode abfrage vor dem speicher-if in stopBtn
++ subprocess ersetzten durch countthread_test direkt mit process-inheritance
++ messageQueue einrichten, die stopBtn auslösen soll. abfrage in startBtn nach animate, Queue input in der while schleife in finiteMeasurement
++ countThread_test = daemonprocess
+
+result:
++ continuous 10Hz ok, animation läuft
++ finite 300s 10hz ok, animation läuft, manuell stoppen ruft error beim speichern (noch keine übergabe von iteration und daten)
++ kein programm exit, aber mit ctrl+c möglich
+
+change:
++ senden von self._data über messageQ, input ausserhalb der while-schleife in finiteMeasurement, abfrage nach speicher-if in stopBtn
++ print(data sent) dahinter
+
+result:
++ continuous 1kHz ok, animation da, stoppen möglich
++ finite 1kHz 300s ok, animation ok, stoppen ruft error beim speichern(keine übergabe der iteration...)
++ programm exits
+
+change:
++ resize in speichern in stopBtn aus-#
++ impuls generator an
+
+result:
++ continuous 1kHz ruft error daqmx -50103, app hängt
+
+change:
++ impulsgenerator aus
+
+result:
++ continuous ruft daqmx error -50103, app hängt
+
+change:
++ print frequency aus sampleclock gelöscht
++ Task() in sampleclock init aus-#
+
+result:
++ continuous 1kHz daqmx error -50103, app hängt
+
+change:
++ measurement in countthread_test aus-#, nur init der daqmx tasks
+
+result:
++ continuous 1kHz: daqmx error -50103
+
+change:
++ sample clock test in ordner test
+
+result:
++ daqmx error -50103
+
+change:
++ task() aus-# in init und startclock
+
+result:
++ as expected, task not found
+
+change:
++ task() und frequency berechnung in startclock enabled
+
+result:
++ daqmx error -50103
+
+change:
++ startclock und stopclock in main aus-#
+
+result:
++ timer zählt 20s, as expected
++ oszi zeigt den puls
+
+change:
++ nur stopclock in main enabled
+
+result:
++ error kein task vorhanden, der gestoppt werden kann
++ puls immer noch da
+
+change:
++ console schließen
+
+result:
++ puls task gestoppt
+
+change:
++try/exception/finally struktur in main mit value error
+
+result:
++ programm läuft einwandfrei, kein error, task beendet, puls 100us, danach weg
+
+change:
++ try... struktur weglassen
+
+result:
++ programm läuft einwandfrei
+
+thoughts: vor dem schließen der console war ein puls mit 1ms perdiodendauer zu sehen -> frequenz noch von den animation_subprocess tasks, die test sampleclock läuft mit 10kHz -> 100us periodendauer. puls task wird nicht richtig beendet.
+
+change:
++ animation_subprocess nur die sampleclock laufen lassen und auf dem oszi anzeigen, auch keine animation
+
+result:
++ task started, stop button hängt app auf
++ puls verschwindet erst nach schließen der konsole
+
+change:
++ print iteration in continuous
+
+result:
++ task started, iteration läuft
++ stop button friert die app ein
++ ctrl+c beendet app und pulse task
+
+change:
++ struktur der while schleife in contMeasurement vereinfacht
+
+result:
++ app friert direkt nach start ein
++ ctrl+c beendet app und puls
+
+change:
++ daemon aus-#
+
+result:
++ app friert ein
+
+change:
++ daemon und super class aus-#
+
+result:
++ process class error
+
+change:
++ start und stopclock aus-#
+
+result:
++ app friert ein
++ kein puls, as expected
+
+change:
++ refreshsetting aus-#
+
+result:
++ app friert nach start ein
+
+change:
++ add freeze_support in main
+
+result:
++ app friert ein
+
+change:
++ try/except7finally clause mit stopBtn als finally
+
+result:
++ keine iteration, programm geht direkt von try zu finally und stopBtn über, keine exception raised
+
+change:
++ sampleclock wieder einbinden
+
+result:
++ kein pulse, keine iteration
+
+change:
++ try clause an den anfang von startBtn
+
+result:
++ kein try ausgeführt
+
+change:
++ try/except clause entfernt
+
+result:
++ continuous 1kHz ok, pulse started und stoppt
++ finite 1khz ok, manuell gestoppt ok
++ finite 1khz 3s ungestoppt, daqmx error -50103, puls mit programm gestoppt
+
+change:
++ beende programm und konsole
+
+result:
++ continuous 1khz ok, pulse gestarted und gestoppt
++ continuous 10hz, pulse 100ms und gestoppt
++ finite 10hz und 300s kein puls, sofort gestoppt
++ erneutes starten gibt "already running"
++ stoppen möglich
++ restart möglich
+
+change:
++ try and except in run() in countthread_test
+
+result:
++ continuous 1khz ok, 1ms, gestoppt, pulse weg
++ continuous 10hz ok, 1s, gestoppt, pulse weg
++ finite 10hz 300s, kein puls, start stop ok
++ finite 100hz, puls ganz kurz sichtbar
+
+change:
++ try/except entfernt
+
+result:
++ continuous mehrer male ok
++ finite raise erros daqmx -50103
+
+change:
++ try and except nochmal an der gleichen stelle in finite
+
+result:
++ continuous 1khz ok, pulse 1ms, start und stop ok
++ finite 1khz 300s ok, pulse 1ms
++ finite 100hz 300s ok, pulse ok, gestoppt und stop ok
+
+change:
++ counter geladen, nicht gestartet
+
+result:
++ continuous 1khz ok
++ finite 1khz ok
++ finite 100hz ok
+
+change:
++ counter wieder dazu
++ kein oszi mehr, dafür impuls gen
++ print(iteration, g) in finite
+
+result:
++ continuous 1khz ok, start/stop ok, der letzte wert wird nach "stop" geprinted
++ ""
++ finite 1khz ok, start7stop ok, auch hier der letzte wert
++ finite 10hz 30s raise daqmx error -50103
++ pulse läuft auf dem oszi weiter, 1ms periodendauer, also vom vorherigen task. weg wenn programm geschlossen.
+
+change:
++ try clause mit stop alle tasks nach der while schleife in finite, die wurden sonst nur bei der steps< iteration abfrage gestoppt
+
+result:
++ mehrere läufe ok, try/except fängt tatsächlich ungestoppte tasks
++ kein error, kein puls auf dem oszi
+
+++++++++++++
+git commit
+++++++++++++
+
+change:
++ speicher-if eingebunden, messageQueue sendet self._data, stop message über messageQueue
+
+result:
++ continuous friert app
+
+change:
++ try/except um messageQ, damit nur bei finite auf die message gewartet wird
+
+result:
++ app friert ein
+
+change:
++ timeout in q.get()
+
+result:
++ 
+
+
+

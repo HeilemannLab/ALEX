@@ -1,0 +1,3 @@
+REM C:\Users\Karoline2\AppData\Local\Programs\Python\Python35\python.exe C:\Users\Karoline2\AppData\Local\Programs\Python\Python35\Scripts\f2py.py -c --fcompiler=gfortran --compiler=mingw32 Fib2.F90 -m fib2
+:: C:\Users\Karoline2\AppData\Local\Programs\Python\Python35\python.exe C:\Users\Karoline2\AppData\Local\Programs\Python\Python35\Scripts\f2py.py -c --fcompiler=gfortran --compiler=mingw32 Fib3.F90 -m fib3
+REM C:\Users\Karoline2\AppData\Local\Programs\Python\Python35\python.exe f2py_test.py

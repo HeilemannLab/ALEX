@@ -1,0 +1,36 @@
+Mindestanforderungen:
+
+- Menüleiste ausklappen
+- Unter Menüpunkt 'Load session' eine .p Datei einladen, und die darin enthaltenen Messeinstellungen übernehmen
+- Unter Menüpunkt 'Save session' die aktuellen Messeinstellungen in eine .p Datei schreiben
+- Unter Menüpunkt 'Close' wird das Mainwindow und alle anderen Fenster geschlossen
+- Laserintensität mit Slider oder Feld einstellen, Silder und Felder aktualisieren sich gegenseitig
+- ALEX Frequenz einstellen, dabei bedeutet ALEX Frequenz, dass in einer Periode beide Laser 1x AN sind
+- Prozentsatz der ALEX Periode, während der der jeweilige Laser AN ist, einstellbar mit einem Slider und Feldern,
+	Slider und Felder aktualisieren sich gegenseitig
+- Messdauer in Sekunden einstellen, die Messzeit in 'Finite' beträgt die Messdauer
+- Modii 'Finite' und 'Continuous' sind auswählbar und aktualisieren im dictionary
+- Start button lässt den User den Zielordner und einen 'Tag' für die Messung auswählen, und startet ANSCHLIEßEND die Messung
+- Starten der Messung bedeutet Starten der Processes 'Counter', 'Dataprocesser', und 'Laser', und der Threads 'Waiter' und 'Animation'
+- Während der Messung:
+		+ 'Laser' startet den Timing Pulse, der als Trigger für das analoge Signal zu Intensitätssteuerung, dem digitalen Signal für das ALEX-Muster
+			und dem 'Counter' dient.
+		+ ALEX-Muster, analoges Signal und ReadCounter starten gleichzeitig
+		+ 'StartMeasurement' startet die Processes erst, nachdem von alle dreien eine Semaphore acquiriert wurde.
+		+ 'Counter' liest die Arrays aus der Karten-FIFO und schickt sie via FIFO-Queue an den Dataprocesser
+		+ 'Dataprocesser' schreibt den Array in einen HDF file und rechnet die durchschnittliche Frequenz innerhalb des Arrays aus
+		+ Die Frequenzen werden via FIFO-Queue an 'Animation' gesendet
+		+ 'Animation' animiert die Daten, und sendet sie an die LCDpanels auf dem Mainwindow
+		+ 'Waiter' im 'Finite' Modus: For Schleife als Countdown, Update des Statusbar, und Beenden der Messung
+		+ 'Waiter' in 'Continuous': Statusbar in 'Undefined' Modus
+- Stop button beendet die Messung im 'Continuous' Modus, aber auch vorzeitig im 'Finite' Modus möglich.
+- Die tempMessungen werden in den Zielordner geschrieben und mit 'Tag' + Datum + Uhrzeit gespeichert
+- Der Menüpunkt 'Convert' konvertiert die TempMessungen zu photon-Hdf5 files:
+		+ Rolloverkorrektur
+		+ Additional information
+		+ Merge + sort (im RAM)
+		+ Dictionary structure
+- Beenden des Programms schließt alle Fenster und va alle Subprozesse
+- LCD Felder zeigen die Frequenzen des richtigen Channels an
+- Progressbar zeigt in 'Finite' Modus den Fortschritt der Messung
+- Statusbar zeigt zu jeder Aktion eine Message

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>20</x>
+      <y>20</y>
+      <w>430</w>
+      <h>340</h>
+    </coordinates>
+    <panel_attributes>Animation
+Animation.py
+--
+- _animDataQ1: multiprocessing.Queue
+- _animDataQ2: multiprocessing.Queue
+- _signal: pyqtSignal
+- _dt: float
+- _tdata: list
+- _greenData: list
+- _redData: list
+- _greenLine: pyplot.Line2D
+- _redLine: pyplot.lines.Line2D
+- _figure: pyplot.figure
+- anim: pyplot.animation
+--
+- __init__(queue animData1, queue animData2, pyqtSignal signal)
+- run()
+- plot()
+- initAnimation()
+- updateAnimation(iterable i)
+- animate()
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>

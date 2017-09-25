@@ -17,8 +17,8 @@ from multiprocessing import Process
 class Counter(Process):
     """
     The counter class is a multiprocessing.Process subclass. It's core functionalty is to start the measurement
-    via the APD class in a new process. The process is regulated from the main loop by the event variable
-    self._running.
+    via the APD class in a new process. The multiprocessing.Event variable 'running' is the control variable
+    which enables control over the while loop from the mainwindow.
     """
     def __init__(self, running, dataQ, readArraySize, semaphore, N):
         """
@@ -40,8 +40,8 @@ class Counter(Process):
 
     def run(self):
         """
-        run() is obligatory for subprocesses. Strangely it gets called by start().
-        This function calls refresh functions, starts counting.
+        run() is obligatory for subprocesses. In the parent it gets called by start().
+        Here the APD class instance and the measurement get started.
         """
         self._apd.startCounting()
         self.Measurement()

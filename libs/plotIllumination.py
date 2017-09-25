@@ -12,6 +12,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 import libs.dictionary
+import pathlib
 # from matplotlib.backends.backend_pdf import PdfPages
 
 
@@ -33,10 +34,11 @@ class plotIllumination:
     def refreshSettings(self, dictionary):
         self._dict_a = dictionary
 
-    def plot(self, fname):
+    def plot(self, filename):
         """
         A plot similar to the digital laser signal combined with the laser power
         gets created here and saved to .png file.
+        @param filename: str
         """
         self._greenPercent = self._dict._a["laser percentageG"]
         self._greenAmp = self._dict._a["lpower green"]
@@ -50,5 +52,4 @@ class plotIllumination:
         plt.axis([-10, 120, -10, 120])
         plt.xlabel("percentage of illumination")
         plt.ylabel("percentage of laser intensity")
-        fname = str(fname + '.png')
-        plt.savefig(fname)
+        plt.savefig(filename)

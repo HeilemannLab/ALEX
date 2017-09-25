@@ -1,0 +1,10 @@
+2017/08/29
+
+git version: no git
+
+test:
++ basic function
++ 1MHz sampling
+
+result:
++ 

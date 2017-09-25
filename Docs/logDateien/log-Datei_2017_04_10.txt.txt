@@ -1,0 +1,79 @@
+2017/04/10
+
+git version: 06.04.2017
+
+result:
++ 
+
+change:
++ iteration queue
++ animation_rate 50hz (monitor 60hz), alles drunter behält die eigene rate
++ if abfrage im animation thread über modulo -> if iteration%animation_rate == 0
+
+result:
++ sehr langsame animation rate
+
+change:
++ animation rate in countthread, die queue wird nur bei iteration % animation_rate == 0 befüllt
+
+result:
++ auf allen frequenzen ok, bis auf 1hz
++ kein stoppen mehr möglich
+
+change:
++ timeout hat keine auswirkung, ersetzen
+
+result:
++ app friert immer noch bei 1hz continuous
+
+change:
++ timeout=1.0 für die get()
++ maximaler messbereich nur von 10khz bis 10hz
+
+result:
++ continuous ok, immer noch jede menge plots
+
+change:
++ self._anim.run.closure()
+
+result:
++ keine auswirkung, aber auch kein error
+
+change:
++ plt.close()
+
+result:
++ continuous 10khz ok, start/stop
++ fenster wird geschlossen
++ warning popup ruft error
+
+change:
++ eigene iteration queue
++ queue.get(timeout=1.0) hinter die if abfragen in waitForStopMessage()
+
+result:
++ everythings fine, except warning of high counts
++ messagebox disappears immediately
+
+change:
++ messagebox icon on critical
++ add messageBox.exec()
+
+result:
++ qmessagebox shows up, blocks
+
+change:
++ ruft signal.warning.disconnect() gleich danach
+
+result:
++ signal is disconnected afterwards
+
+change:
++ reconnect signal on stop
+
+result:
++ es sollte schneller wieder reconnected werden
+
+##############
+git push
+##############

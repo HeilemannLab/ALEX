@@ -1,0 +1,49 @@
+2017/08/04
+
+git version: no git
+
+test:
++ 1MHz sampling, 1e6 array größe
+
+result:
++ continuous: messung läuft, lcd anzeige ok, animation ok, laser analog und digital ok, all workers joined, saving file doesnt work, irgendwas mit x.shape in savtxt
+
+change:
++ data gets processed before, saved only timestamps in shape(i, 2) fmt
+
+result:
++ no file gets saved
+
+change:
++ in savefiles.savetxt change filename[0] to filename
+
+result:
++ file gets saved, but no data
+
+change:
++ print timestamps before they get queued as result from processer to mainwindow
+
+result:
++ prints only the [0, 0] from initialization
++ append on simple arrays with shape(5, 2) returns an array of shape (10,)
+
+change:
++ print(array)
+
+result:
++ print(array) gives nice result
++ append doesnt work
++ test show: appending by np.concatenate is better, especially if it come to huge arrays
+
+change:
++ change to ts = np.concatenate((ts, array))
+
+result:
++ measuring is possible
++ somethings wrong with indices
+
+change:
++ in der korrektur for i in range(len(data)) statt for i in data --> is a double oder sowas
+
+result:
++ fintie mode ok, 30s measurement takes exactly 30s as seen in file

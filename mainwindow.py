@@ -36,7 +36,7 @@ import libs.saveFiles
 class Communicate(QObject):
     """
     Signals make the base communication between Mainwindow and the waiter thread, which operates ProgressBar, Start/Stop and StatusBar.
-    It also does communication between Mainwindow and animation, which provides the lcd displays with values.
+    It also does communication between Mainwindow and animation, which in return feeds the lcd panels with values.
 
     measurementProgress: sends the iteration from waiter to the progressBar in mainwindow
     stopMeasurement: calls the stopBtn() method, when measurement is finite and the measurement duration ends
@@ -58,18 +58,18 @@ class MainWindow(QMainWindow):
     Mainwindow class operates the pyqt5 window and all of its widgets. It also hosts most of the basic methods connected to the widgets.
     There are start and stop methods, and a waiter thread that keeps an eye on the finite measurement. Settings typed by the user get stored
     in a dictionary class and get updated before each measurement call. Mainwindow launches all of the subprocesses connecting to the daqmx cards.
-    Communication between threads and mainwindow is established via pyqtSignals, between mainwindow and  subprocesses via multiprocessing queue.
+    Communication between threads and mainwindow is established via pyqtSignals, between mainwindow and subprocesses via multiprocessing queue.
     The main control variable for measurements is a multiprocessing event variable.
     """
     def __init__(self):
         super(MainWindow, self).__init__()
         """
         Init hosts all the variables and UI related functionality. The following classes can not be initializes in here, because they inherit from
-        multiprocessing.Process: libs.Counter, libs.Laser and libs.dataProcesser. Arguments have to be passed by instance, later there's no possibility,
+        multiprocessing.Process: libs.Counter, libs.Laser and libs.dataProcesser. Arguments have to be passed by inheritance, later there's no possibility,
         due to their separation from the main loop. libs.Animation also gets instanciated later, due to the window launching functionality in its init method.
         """
         self._dict = libs.dictionary.UIsettings()
-        self._files = libs.saveFiles.FileDialogue()
+        self._files = libs.saveFiles.SaveFiles()
         self._mode = self._dict.getitem("Radio")
         self._r = libs.Refresher.Refresh()
         self._readArraySize = int(1e6)    # 1e7 is ok, no more, 1e6 works better (with 1MHz sampling) leads to 1array/sec writing rate
@@ -109,11 +109,11 @@ class MainWindow(QMainWindow):
         # save app, saves measurement settings to file, folder is specified by the last load operation
         self.saveApp = QAction('Save session', self)
         self.saveApp.setShortcut('Ctrl+s')
-        self.saveApp.triggered.connect(lambda: self.GetFileName('save'))
+        self.saveApp.triggered.connect(lambda: self.GetFileName('Save'))
 
         # save Data to .txt file
-        self.saveData = QAction('Save Data to .txt', self)
-        self.saveData.triggered.connect(lambda: self.GetFileName('txt'))
+        self.convertData = QAction('Convert raw data to photon-hdf5', self)
+        self.convertData.triggered.connect(lambda: self.GetFileName('Convert'))
 
         # save Data to .hdf5 file in a manner that it can be processed by the FretBursts library
         self.saveDataHDF = QAction('Save data to .hdf5', self)
@@ -373,7 +373,7 @@ class MainWindow(QMainWindow):
         fileMenue = menubar.addMenu('&File')
         fileMenue.addAction(self.loadApp)
         fileMenue.addAction(self.saveApp)
-        fileMenue.addAction(self.saveData)
+        fileMenue.addAction(self.convertData)
         fileMenue.addAction(self.saveDataHDF)
         fileMenue.addAction(self.closeApp)
 
@@ -382,16 +382,26 @@ class MainWindow(QMainWindow):
         A filename gets collected via PyQt5 pop-up window and the settings dictionary gets updated in the saveFiles class instance self._files.
         Depending on what action should get executed, a key word is provided to the saveFiles.SortTasks method. Loading settings from
         an existing settings file return a dictionary, all other tasks return None. In a load case, the settings in mainwindow get updated.
-        :param keyword: str
+        @param keyword: str
         """
-        f = 'C:\Karoline2\Code'
-        filename = QFileDialog.getSaveFileName(self, 'File dialogue', f)
+        f = 'C:/Karoline2/Code'
         self._files.refreshSettings(self._dict._a)
-        new_dict = self._files.SortTasks(keyword, filename[0])
-        self.statusBar.showMessage("Wait until data is processed!")
-        if new_dict is not None:
+        if keyword == 'Load':
+            answer = QFileDialog.getOpenFileName(parent=self, caption='Select filename', directory=f)
+            new_dict = self._files.loadSetsDict(os.path.join(answer[1], answer[0]))
             self._dict._a = new_dict
             self.refreshAll()
+        elif keyword == 'Save':
+            answer = QFileDialog.getSaveFileName(parent=self, caption='Select filename', directory=f)
+            self._files.saveSetsDict(answer[1], answer[0])
+        elif keyword == 'hdf5':
+            answer = QFileDialog.getSaveFileName(parent=self, caption='Select filename', directory=f)
+            self._files.saveRawData(answer[1], answer[0])
+        else:
+            files = QFileDialog.getOpenFileNames(parent=self, caption='Select files', directory=f)
+            self._files.ConvertToPhotonHDF5(files=files[0])
+
+        self.statusBar.showMessage("Wait until data is processed!")
         self.statusBar.showMessage("Data saved!")
 
     def closeApplication(self):
@@ -465,6 +475,13 @@ class MainWindow(QMainWindow):
             self.statusBar.showMessage("Already running!")
 
     def startProcesses(self):
+        # Specify file location
+        f = 'C:/Users/Karoline2/Code/Alex/Measurements'
+        answer = QFileDialog.getSaveFileName(parent=self, caption='Select filename', directory=f)
+        print('1: ', type(answer[0]), answer[0])
+        folder = self._files.saveRawData(answer[0])
+
+        """
         # Initialize processes and waiter thread
         self._counter1 = libs.Counter.Counter(self._running, self._dataQ1, self._readArraySize, self._semaphore, 1)
         self._counter2 = libs.Counter.Counter(self._running, self._dataQ2, self._readArraySize, self._semaphore, 2)
@@ -474,7 +491,7 @@ class MainWindow(QMainWindow):
         self._dataProcesser2 = libs.dataProcesser.DataProcesser(self._dataQ2, self._animDataQ2, self._readArraySize, 2)
         self.statusBar.showMessage("Started!")
         self._anim.run()
-        self._u = Thread(target=self.waitForIteration, args=(), name='iterator', daemon=True)
+        self._u = Thread(target=self.waiter, args=(), name='iterator', daemon=True)
 
         # Starting all processes and threads
         self._counter1.start()
@@ -484,8 +501,9 @@ class MainWindow(QMainWindow):
         self._dataProcesser1.start()
         self._dataProcesser2.start()
         self._anim.animate()    # this command is vicious, it seems everything after it gets delayed or not executed at all. Best always called last.
+        """
 
-    def waitForIteration(self):
+    def waiter(self):
         """
         Illumination and APDs acquire the semaphore after initialization of tasks, the waiter waits for the semaphore to have its internal counter down to zero
         (when als tasks are ready). Only then the waiter proceeds and does actually nothing (mode = 0 --> continuous mode) or starts the progressBar and timing

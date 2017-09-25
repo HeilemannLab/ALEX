@@ -1,0 +1,14 @@
+Aufgaben:
++ 30s Messung mit dem neuen Modul ausprobieren (integer(kind=8) für die t's)
++ 150s oder 180s messung im ram testen, und die größe der int nach den rollovern checken -> reicht der speicherplatz aus?
++ convertieren der files von 'save' in ein 'convert' funktion/program
++ 'save' mit speziellen user-def präfix und zeit/datum
++ alle angaben in der 'maske' schon mal in eine bibliothek schreiben fürs hdf
++ mindestanforderungen für das ganze program aufstellen
++ tägliches labbook!!
++ convert auch ans main ankoppeln mit "try...except"
++ uml und class infos updaten
++ schlauen zeitplan für jeden tag ausdenken
++ alten pc ausmisten und neuen sichern auf die festplatte
++ office 365 installieren
++ thunderbird messages unterdrücken

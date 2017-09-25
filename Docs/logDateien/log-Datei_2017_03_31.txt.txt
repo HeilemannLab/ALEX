@@ -1,0 +1,129 @@
+2017/03/31
+
+git pull: version vom 30.03.2017
+
+change:
++ timeout der messageQ.get() auf die duration eingestellt
+
+result:
++ app friert ein
+
+change:
++ timeout auf 0.1
++ try/except um messageQ.get() in while True schleife in neue funktion
++ funktion threaden
+
+result:
++ continuous 1kHz ok, while schleife kann nicht gestoppt werden
+
+change:
++ while True durch while not stop.request.is_set(): ersetzt
+
+result:
++ continuous 1khz ok, message gets checked, start/stop ok
++ finite 1khz 3s, qdialoque gets executed from thread which is not desirable
+
+change:
++  use pyqt signal instead of direkt function call from thread
+
+result:
++ continous 1khz ok, start/stop ok
++ continuous erneut ok
++ finite 1khz 30s friert die app ein
++ kein puls auf dem oszi
+
+change:
++ neu gestarted
+
+result:
++ inite 1khz 3s, läuft ok
++ resultfile ok
++ finite 10hz 3s ok, resultfile ok
+
+change:
++ print funktionen aus-#
+
+result:
++ continuous 1khz ok
++ continuous 10hz ok
++ continuous 1hz ok
++ finite 1hz 3s ok, ungestoppt, resultfile ok
++ finite 100hz 30s, manually gestoppt, resultfile ok
+
+change:
++ queues to animation opened
+
+result:
++ continuous multiple frq ok
++ finite 1hz manually stopped, resultfile ok
++ finite 10khz manually stopped, app friert nach speichern für mehrere sekunden, resultfile ok
+
+change:
++ messageQ in finiteMeasurement queue für iteration -> progressbar
++ waitforstopmessage thread gets iteration, setvalue from thread
+
+result:
++ continuous 1khz kein progress bar
++ finite 1khz nach wenigen iterationen progress auf 100%
+
+change:
++ setvalue(message/self._steps)
++ eingebaut als elif message == int: in waitForStopMessage
++ else als setrange(0,0) für continuous
+
+result:
++ continuous kein progressbar
++ finite busy mode progressbar
+
+change:
++ if else mode abfage vor try/except
+
+result:
++ continuous busy mode progressbar
++ finite 1khz auch busy mode
+
+change:
++ setrange(0, self._steps)
+
+result:
++ wie zuvor
+
+change:
++ pass nach setrange bei self._mode == 0 gelöscht
+
+result:
++ keine veränderung
+
+change:
++ setrange vor while schleife
++ print(progressbar set)
+
+result:
++ wie zuvor
+
+change:
++ self._mode abfrage direkt als erstes in waitforstopmessage
+
+result:
++ continuous ok
++ finite: QWidget recursive repaint detected
+
+change:
++ change else to elif message == int: 
+
+result:
++ finite busy mode progressbar
+
+change:
++ setvalue nach messageq.get()
+
+result:
++ recursive repaint
+
+change:
++ setvalue nach stop abfrage
+
+result:
++ continuous 1khz daqmx error -50103
++ puls auf den oszi
++ ctrl+c keine auswirkung, nur console schließen hilft

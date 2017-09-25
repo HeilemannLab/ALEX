@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>20</x>
+      <y>20</y>
+      <w>210</w>
+      <h>140</h>
+    </coordinates>
+    <panel_attributes>UIsettings
+dictionary.py
+--
+- a: dict
+- self._a: dict
+--
+- __init__()
+- getitem(string item)
+- setitem(string item, float var)</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>

@@ -14,8 +14,10 @@ from PyQt5.QtWidgets import QLineEdit, QLabel, QVBoxLayout, QPushButton, QDialog
 
 class HDFmask(QDialog):
     """
-    This class provides a raw interface to fill in the measurement variables, which are needed to
-    get a nice photon-HDF file, as it is desired by Fretbursts. This is not ready yet.
+    This class provides a raw interface to fill in the additional information, which is required to
+    get a nice photon-HDF file. This library can be accessed from 'save Data' and 'Convert Data'.
+    Always create a class instance and execute the window by calling 'instance.maskWindow()'. It is
+    possible to pass an old dictionary.
     """
     def __init__(self):
         super(HDFmask, self).__init__()
@@ -79,11 +81,16 @@ class HDFmask(QDialog):
         vbox.addWidget(saveButton)
 
         self.setLayout(vbox)
-        self.setWindowTitle("hdf5 mask")
+        self.setWindowTitle("Additional measurements informations")
 
-    def maskWindow(self):
+    def maskWindow(self, dictionary=None):
+        if dictionary is None:
+            pass
+        else:
+            self._dict.update(dictionary)
         self.exec_()
         # self.show()
+        return self._dict
 
     def saveFile(self):
         self.close()
