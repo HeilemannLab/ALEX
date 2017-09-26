@@ -23,21 +23,26 @@ class Refresh:
     def refreshUI(self, changeType, changeKey, value):
         """
         Sorts the type of change, passes changeKey and value
-        :param changeType: str
-        :param changeKey: Key
-        :param value: int or float
+        @param changeType: str
+        @param changeKey: Key
+        @param value: int or float
         """
         if changeType == 0:
             self.refreshSliderSettings(changeKey, value)
         if changeType == 1:
             self.refreshBoxSettings(changeKey, value)
         if changeType == 2:
-            self.changeRadioButton(changeKey)
-            self.changeRadioButton(value)   # check if this here is necessary
+            # self.changeRadioButton(changeKey)   # check if this here is necessary)
+            self.changeRadioButton(value)
         return self._dict._a
 
     # Input functions
     def changeRadioButton(self, b):
+        """
+        The radiobuttons change their state only over the 'isChecked'
+        attribute, so they need this special treatment.
+        @param b: QRadioButton
+        """
         if b.text() == 'Continuous':
             if b.isChecked():
                 self._dict._a["Radio"] = 0
@@ -49,7 +54,10 @@ class Refresh:
     def refreshSliderSettings(self, changeKey, value):
         """
         This function could maybe merged with the next and simplified. Keywords could be
-        red and green, or percentage.
+        red and green, or percentage. The key of this refreshing algorithm is, that
+        the depending variables take and write values from the same dictionary item.
+        @param changeKey: str
+        @param value: float
         """
         if changeKey == 'sld_red':
             self._dict._a["lpower red"] = value
@@ -57,8 +65,17 @@ class Refresh:
             self._dict._a["lpower green"] = value
         elif changeKey == 'sld_percentage':
             self._dict._a["laser percentageG"] = value
+        else:
+            print("No valid slider name!")
 
     def refreshBoxSettings(self, changeKey, value):
+        """
+        This is basically an extension of the above function.
+        Maybe it's easier to read if it stays two function,
+        but thwy could be merged.
+        @param changeKey: str
+        @param value: float
+        """
         if changeKey == 'sb_red':
             self._dict._a["lpower red"] = value
         elif changeKey == 'sb_green':
@@ -73,3 +90,5 @@ class Refresh:
         elif changeKey == "sb_percentR":
             self._dict._a["laser percentageR"] = value
             self._dict._a["laser percentageG"] = (100.0 - value)
+        else:
+            print("No valid box name!")

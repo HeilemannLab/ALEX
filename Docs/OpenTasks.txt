@@ -1,7 +1,8 @@
-+ save parameters in .pickle and .txt
-+ save plot in .txt and .pdf
-+ save data in .txt and .hdf5
-+ fretbursts
-+ accelerate program
-+ write 1 page paper, motivation
-+ write umlets
+﻿Aufgaben:
++ 30s Messung mit dem neuen Modul ausprobieren (integer(kind=8) für die t's)
++ 150s oder 180s messung im ram testen, und die größe der int nach den rollovern checken -> reicht der speicherplatz aus?
++ convertieren der files von 'save' in ein 'convert' funktion/program
++ mindestanforderungen für das ganze program erweitern und verbessern
++ convert auch ans main ankoppeln mit "try...except"
++ neuen pc sichern
++ checken, ob da timing in zwei rtsi kanäle exportieren muss -> kann der analoge task auch von rtsi 0 aus gesamplet werden?

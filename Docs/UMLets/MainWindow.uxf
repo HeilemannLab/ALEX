@@ -79,7 +79,7 @@ mainwindow.py
 - refreshAll()
 - startBtn()
 - startProcesses()
-- waitForIteration()
+- waiter()
 - pyqtSlot(int) setProgressBar(int i)
 - pyqtSlot(list) displayRatesOnLCD(list x)
 - pyqtSlot() warnPopup()

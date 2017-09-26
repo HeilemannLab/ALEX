@@ -12,7 +12,6 @@
 import numpy as np
 from matplotlib import pyplot as plt
 import libs.dictionary
-import pathlib
 # from matplotlib.backends.backend_pdf import PdfPages
 
 
@@ -37,7 +36,8 @@ class plotIllumination:
     def plot(self, filename):
         """
         A plot similar to the digital laser signal combined with the laser power
-        gets created here and saved to .png file.
+        gets created here and saved to .png file. A try gave the hint that
+        'savefig' may not support .pdf file format.
         @param filename: str
         """
         self._greenPercent = self._dict._a["laser percentageG"]

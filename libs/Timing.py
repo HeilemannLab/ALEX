@@ -29,8 +29,8 @@ class SampleClock:
 
     def InitClock(self):
         """
-        The timing pulse gets exported to RTSI0 as trigger signal for the counter tasks and RTSI 2
-        for the analog output task.
+        The timing pulse gets exported to RTSI 0 on Dev2 as trigger signal for the counter tasks
+        and to RTSI 2 on Dev1 as sample clock for the analog output task.
         """
         self._freq = self._dict._a["laser frequency"]
 

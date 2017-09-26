@@ -15,10 +15,10 @@ Refresher.py
 - _sets: dict
 --
 - __init__()
-- refreshUI()
+- refreshUI(str changeType, str changeKey, float value)
 - changeRadioButton(pyqt.QRadioButton b)
-- refreshSliderSettings(string changeKey, float value)
-- refreshBoxSettings(string changeKey, float value)</panel_attributes>
+- refreshSliderSettings(str changeKey, float value)
+- refreshBoxSettings(str changeKey, float value)</panel_attributes>
     <additional_attributes/>
   </element>
 </diagram>
