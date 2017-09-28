@@ -34,6 +34,8 @@ class Refresh:
         if changeType == 2:
             # self.changeRadioButton(changeKey)   # check if this here is necessary)
             self.changeRadioButton(value)
+        if changeType == 3:
+            self._dict._a = changeKey
         return self._dict._a
 
     # Input functions

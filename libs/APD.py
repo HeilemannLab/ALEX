@@ -57,6 +57,7 @@ class TimestampingCounters:
         # Important note for arm start trigger: Always start trigger pulse AFTER counter tasks, else NO SYNC!
 
     def InitializeCounter1(self):
+        """Task channels get configured"""
         self._counter1 = Task()
         self._counter1.CreateCICountEdgesChan(counter="Dev2/ctr0",
                                               nameToAssignToChannel="",

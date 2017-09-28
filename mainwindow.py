@@ -21,7 +21,7 @@ from multiprocessing import Event as mpEvent
 from multiprocessing import Queue as mpQueue
 from multiprocessing import Semaphore
 
-from PyQt5.QtWidgets import QGroupBox, QMessageBox, QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QPushButton, QStatusBar, QAction, QFileDialog, QSlider, QSpinBox, QRadioButton, QProgressBar, QLabel, QGridLayout, QLCDNumber
+from PyQt5.QtWidgets import QGroupBox, QMessageBox, QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QPushButton, QStatusBar, QAction, QFileDialog, QSlider, QSpinBox, QRadioButton, QProgressBar, QLabel, QGridLayout, QLCDNumber, QLineEdit
 from PyQt5.QtCore import Qt, pyqtSignal, QObject, pyqtSlot
 
 import libs.dictionary
@@ -93,7 +93,7 @@ class MainWindow(QMainWindow):
         # Window and widgets #
         # ################## #
 
-        self.setGeometry(500, 300, 500, 200)
+        self.setGeometry(500, 300, 500, 200)    # x, y, width, height
 
         # ## Statusbar
         self.statusBar = QStatusBar()
@@ -102,22 +102,27 @@ class MainWindow(QMainWindow):
 
         # ## file menue
         # load app, loads laser settings from file
-        self.loadApp = QAction('Load session', self)
+        self.loadApp = QAction('Load settings', self)
         self.loadApp.setShortcut('Ctrl+l')
-        self.loadApp.triggered.connect(lambda: self.GetFileName('Load'))
+        self.loadApp.triggered.connect(self.loadDict)
 
         # save app, saves measurement settings to file, folder is specified by the last load operation
-        self.saveApp = QAction('Save session', self)
+        self.saveApp = QAction('Save settings', self)
         self.saveApp.setShortcut('Ctrl+s')
-        self.saveApp.triggered.connect(lambda: self.GetFileName('Save'))
+        # self.saveApp.triggered.connect(lambda: self.GetFileName('Save'))
+        self.saveApp.triggered.connect(lambda: self._files.saveSetsDict(self._dict._a, self.getDirectory(), 'Measurement_settings'))
 
-        # save Data to .txt file
+        # convert data to photon-hdf5
         self.convertData = QAction('Convert raw data to photon-hdf5', self)
-        self.convertData.triggered.connect(lambda: self.GetFileName('Convert'))
+        # self.convertData.triggered.connect(lambda: self.GetFileName('Convert'))
+        self.convertData.triggered.connect(self._files.ConvertToPhotonHDF5)     # This is still not ready!!
+                                                                                # A file dialog could hint the method
+                                                                                # to the right folder, where it
+                                                                                # searches for the temp files on its own
 
         # save Data to .hdf5 file in a manner that it can be processed by the FretBursts library
-        self.saveDataHDF = QAction('Save data to .hdf5', self)
-        self.saveDataHDF.triggered.connect(lambda: self.GetFileName('hdf5'))
+        self.saveDataHDF = QAction('This widget is free', self)
+        self.saveDataHDF.triggered.connect(lambda: self.GetFileName('free'))
 
         # close the app
         self.closeApp = QAction('Close', self)
@@ -125,6 +130,21 @@ class MainWindow(QMainWindow):
         self.closeApp.triggered.connect(self.closeApplication)
 
         self.menueLayout()
+
+        # File location
+        filesGroup = QGroupBox()
+        hbox12 = QHBoxLayout()
+        filesGroup.setLayout(hbox12)
+
+        self._location = QLineEdit()
+        self._location.setMaxLength(50)
+        self._location.setReadOnly(True)
+        hbox12.addWidget(self._location)
+        hbox12.setSpacing(10)
+
+        self._browseButton = QPushButton('Browse', self)
+        self._browseButton.clicked.connect(self.getFileLocation)
+        hbox12.addWidget(self._browseButton)
 
         # ## label for different widgets
         self.label1 = QLabel("Laserpower green")
@@ -159,13 +179,17 @@ class MainWindow(QMainWindow):
         hbox10 = QHBoxLayout()
         hbox10.setSpacing(30)
         vbox1 = QVBoxLayout()
-        vbox1.addWidget(self.label1)
-        vbox1.addLayout(hbox1)
         vbox1.addWidget(self.label2)
+        vbox1.addLayout(hbox1)
+        vbox1.addStretch(1)
+        vbox1.addWidget(self.label1)
         vbox1.addLayout(hbox2)
+        vbox1.addStretch(1)
         vbox1.addWidget(self.label3)
         vbox1.addLayout(hbox9)
+        vbox1.addStretch(1)
         vbox1.addLayout(hbox11)
+        vbox1.addStretch(1)
         vbox1.addLayout(hbox10)
         vbox1.addStretch(1)
         laserGroup.setLayout(vbox1)
@@ -311,12 +335,12 @@ class MainWindow(QMainWindow):
         buttonGroup.setLayout(vbox3)
 
         # Start button
-        self.startButton = QPushButton("start", self)
+        self.startButton = QPushButton("Start", self)
         self.startButton.clicked.connect(self.startBtn)
         hbox6.addWidget(self.startButton)
 
         # Stop button
-        self.stopButton = QPushButton("stop", self)
+        self.stopButton = QPushButton("Stop", self)
         self.stopButton.clicked.connect(self.stopBtn)
         hbox6.addWidget(self.stopButton)
 
@@ -358,10 +382,11 @@ class MainWindow(QMainWindow):
 
         # Arrange groups in grid:
         grid = QGridLayout()
-        grid.addWidget(laserGroup, 0, 0, 2, 2)
-        grid.addWidget(apdGroup, 0, 2, 1, 1)
-        grid.addWidget(buttonGroup, 1, 2, 1, 1)
-        grid.addWidget(lcdGroup, 2, 0, 1, 3)
+        grid.addWidget(filesGroup, 0, 0, 1, 3)
+        grid.addWidget(laserGroup, 1, 0, 2, 2)
+        grid.addWidget(apdGroup, 1, 2, 1, 1)
+        grid.addWidget(buttonGroup, 2, 2, 1, 1)
+        grid.addWidget(lcdGroup, 3, 0, 1, 3)
         self.centralBox.setLayout(grid)
 
     def menueLayout(self):
@@ -377,32 +402,30 @@ class MainWindow(QMainWindow):
         fileMenue.addAction(self.saveDataHDF)
         fileMenue.addAction(self.closeApp)
 
-    def GetFileName(self, keyword):
-        """
-        A filename gets collected via PyQt5 pop-up window and the settings dictionary gets updated in the saveFiles class instance self._files.
-        Depending on what action should get executed, a key word is provided to the saveFiles.SortTasks method. Loading settings from
-        an existing settings file return a dictionary, all other tasks return None. In a load case, the settings in mainwindow get updated.
-        @param keyword: str
-        """
-        f = 'C:/Karoline2/Code'
-        self._files.refreshSettings(self._dict._a)
-        if keyword == 'Load':
-            answer = QFileDialog.getOpenFileName(parent=self, caption='Select filename', directory=f)
-            new_dict = self._files.loadSetsDict(os.path.join(answer[1], answer[0]))
-            self._dict._a = new_dict
-            self.refreshAll()
-        elif keyword == 'Save':
-            answer = QFileDialog.getSaveFileName(parent=self, caption='Select filename', directory=f)
-            self._files.saveSetsDict(answer[1], answer[0])
-        elif keyword == 'hdf5':
-            answer = QFileDialog.getSaveFileName(parent=self, caption='Select filename', directory=f)
-            self._files.saveRawData(answer[1], answer[0])
-        else:
-            files = QFileDialog.getOpenFileNames(parent=self, caption='Select files', directory=f)
-            self._files.ConvertToPhotonHDF5(files=files[0])
+    def getFilename(self):
+        start = 'C:/Users/Karoline2'
+        path = QFileDialog.getOpenFileName(None, 'Select file', start)
+        return path[0]
 
-        self.statusBar.showMessage("Wait until data is processed!")
-        self.statusBar.showMessage("Data saved!")
+    def getDirectory(self):
+        start = 'C:/Users/Karoline2'
+        path = QFileDialog.getExistingDirectory(None, 'Select directory', start, QFileDialog.ShowDirsOnly)
+        return path
+
+    def getFileLocation(self):
+        path = self.getDirectory()
+        self._location.setText(path)
+        print(self._location.text())
+
+    def loadDict(self):
+        path = self.getFilename()
+        new_dict = self._files.loadSetsDict(path)
+        if new_dict is not None:
+            self._dict._a.update(new_dict)
+            self.refreshUI(3, self._dict._a, 0)
+            self.statusBar.showMessage('Settings updatet!')
+        else:
+            self.statusBar.showMessage('No valid settings dictionary in that file!')
 
     def closeApplication(self):
         """Close the app and animation window via file menue."""
@@ -475,13 +498,14 @@ class MainWindow(QMainWindow):
             self.statusBar.showMessage("Already running!")
 
     def startProcesses(self):
+        """
         # Specify file location
         f = 'C:/Users/Karoline2/Code/Alex/Measurements'
         answer = QFileDialog.getSaveFileName(parent=self, caption='Select filename', directory=f)
         print('1: ', type(answer[0]), answer[0])
         folder = self._files.saveRawData(answer[0])
-
         """
+
         # Initialize processes and waiter thread
         self._counter1 = libs.Counter.Counter(self._running, self._dataQ1, self._readArraySize, self._semaphore, 1)
         self._counter2 = libs.Counter.Counter(self._running, self._dataQ2, self._readArraySize, self._semaphore, 2)
@@ -501,7 +525,6 @@ class MainWindow(QMainWindow):
         self._dataProcesser1.start()
         self._dataProcesser2.start()
         self._anim.animate()    # this command is vicious, it seems everything after it gets delayed or not executed at all. Best always called last.
-        """
 
     def waiter(self):
         """

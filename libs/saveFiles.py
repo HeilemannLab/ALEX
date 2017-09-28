@@ -171,12 +171,14 @@ class SaveFiles:
         with filename.open('wb') as f:
             pickle.dump(dictionary, f)
 
-    def saveSetsDict(self, folder, filename):
+    def saveSetsDict(self, dictionary, folder, filename):
         """
         Saves the settings of the measurement as txt and pickle file.
+        @param: dictionary: dict
         @param folder: str
         @param filename: str
         """
+        self.refreshSettings(dictionary)
         path = pathlib.Path(folder, filename)
         # pickle file
         filename = path.with_suffix('.p')
@@ -196,13 +198,14 @@ class SaveFiles:
         and returns a dictionary.
         @param fname: str
         """
+        dictionary = None
         path = pathlib.Path(path)
-        if path.is_file():
+        if not path.is_file():
+            print("Error: Empty file or no valid .p file")
+        else:
             with path.open("rb") as f:
                 dictionary = pickle.load(f)
-            return dictionary
-        else:
-            print("Error: Empty file!")
+        return dictionary
 
 if __name__ == '__main__':
     filename = 'saveFiletester.hdf'

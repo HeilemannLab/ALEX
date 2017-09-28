@@ -18,9 +18,10 @@ class TimestampingCounters:
     """
     This class generates the interface to the 6612 card, in detail the counter input tasks. The 6612 card should be 'Device 2'.
     """
-    def __init__(self, readArraySize, N):
+    def __init__(self, readArraySize, N, semaphore):
         self._sampNumber = readArraySize
         self._N = N
+        self._sem = semaphore
         self._buffer = int(1e8)    # 1e8 is possible, no more
         self._value1 = np.zeros([self._sampNumber], dtype=ctypes.c_uint32())
         self._value2 = np.zeros([self._sampNumber], dtype=ctypes.c_uint32())
@@ -43,12 +44,14 @@ class TimestampingCounters:
             self.InitializeCounter1()
             self.SamplingCounter1()
             self.ArmStartCounter1()
+            self._sem.acquire()
             self._rollover1.StartTask()
             self._counter1.StartTask()
         else:
             self.InitializeCounter2()
             self.SamplingCounter2()
             self.ArmStartCounter2()
+            self._sem.acquire()
             self._rollover2.StartTask()
             self._counter2.StartTask()
         # Important note for arm start trigger: Always start trigger pulse AFTER counter tasks, else NO SYNC!

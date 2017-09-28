@@ -14,6 +14,7 @@ APD.py
 --
 - _sampNumber: int
 - _N: int
+- _sem: multiprocessing.Semaphore
 - _buffer: int
 - _value1: ndarray
 - _value2: ndarray
@@ -21,12 +22,12 @@ APD.py
 - _roll2: ndarray
 - _data: ndarray
 - _read: int32
-- _counetr1: daqmx.task
+- _counter1: daqmx.task
 - _counter2: daqmx.task
 - _rollover1: daqmx.task
 - _rollover2: daqmx.task
 --
-- __init__(int readArraySize, int N)
+- __init__(int readArraySize, int N, Semaphore semephore)
 - startCounting()
 - InitializeCounter1
 - IntializeCounter2

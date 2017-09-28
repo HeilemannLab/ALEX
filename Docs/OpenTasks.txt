@@ -6,3 +6,4 @@
 + convert auch ans main ankoppeln mit "try...except"
 + neuen pc sichern
 + checken, ob da timing in zwei rtsi kanäle exportieren muss -> kann der analoge task auch von rtsi 0 aus gesamplet werden?
++ citavi projekt vom alten pc umziehen

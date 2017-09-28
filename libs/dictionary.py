@@ -13,7 +13,7 @@
 
 class UIsettings:
     """
-    The UIsetting class host a dictionary which holds all the key parameters to the measurement.
+    The UIsetting class hosts a dictionary which holds all the key parameters to the measurement.
     Methods 'getitem' and 'setitem' are outdated.
     """
     def __init__(self):
@@ -29,7 +29,16 @@ class UIsettings:
         self._a = a
 
     def getitem(self, item):
+        """
+        Read the dict item by its key and return it.
+        @param item: string
+        """
         return self._a[item]
 
     def setitem(self, item, var):
+        """
+        Write value 'var' to the key 'item' into dict.
+        @param item: string
+        @param var: float
+        """
         self._a[item] = var

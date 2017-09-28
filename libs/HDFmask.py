@@ -22,35 +22,35 @@ class HDFmask(QDialog):
     def __init__(self):
         super(HDFmask, self).__init__()
         self._dict = {"author_affiliation": "Institute for Physical and Theoretical Chemistry, Goethe-University Frankfurt",
-                      "author": "author name",
-                      "sample_name": "sampleX",
-                      "buffer_name": "buffer",
-                      "dye_names": "dye1, dye2",
-                      "description": "Experiment X",
+                      "author": "Your name",
+                      "sample_name": "Sample",
+                      "buffer_name": "Buffer",
+                      "dye_names": "Dye names, seperated by comma",
+                      "description": "Detailed description",
                       "num_dyes": int(2)}
 
-        label1 = QLabel("author")
-        label2 = QLabel("institute")
-        label3 = QLabel("sample")
-        label4 = QLabel("buffer")
-        label5 = QLabel("dyes")
-        label6 = QLabel("description")
-        label8 = QLabel("number dyes")
+        label1 = QLabel("Author")
+        label2 = QLabel("Institute")
+        label3 = QLabel("Sample name")
+        label4 = QLabel("Buffer name")
+        label5 = QLabel("Dyes")
+        label6 = QLabel("Description")
+        label8 = QLabel("Number of dyes")
 
         line1 = QLineEdit()
-        line1.setPlaceholderText("Your name")
+        line1.setPlaceholderText(self._dict["author"])
         line2 = QLineEdit()
-        line2.setPlaceholderText("Institute for Physical and Theoretical Chemistry, Goethe-University Frankfurt")
+        line2.setPlaceholderText(self._dict["author_affiliation"])
         line3 = QLineEdit()
-        line3.setPlaceholderText("Sample name")
+        line3.setPlaceholderText(self._dict["sample_name"])
         line4 = QLineEdit()
-        line4.setPlaceholderText("Buffer name")
+        line4.setPlaceholderText(self._dict["buffer_name"])
         line5 = QLineEdit()
-        line5.setPlaceholderText("Dye names, separated by comma")
+        line5.setPlaceholderText(self._dict["dye_names"])
         line6 = QLineEdit()
-        line6.setPlaceholderText("detailed description")
+        line6.setPlaceholderText(self._dict["description"])
         line8 = QLineEdit()
-        line8.setPlaceholderText("Number of dyes")
+        line8.setPlaceholderText(str(self._dict["num_dyes"]))
 
         line1.textChanged.connect(lambda: self.setitem("author", line1.text()))
         line2.textChanged.connect(lambda: self.setitem("author_affiliation", line2.text()))
@@ -61,7 +61,7 @@ class HDFmask(QDialog):
         line8.textChanged.connect(lambda: self.setitem("num_dyes", int(line8.text())))
 
         saveButton = QPushButton("Save")
-        saveButton.clicked.connect(self.saveFile)
+        saveButton.clicked.connect(self.saveInfos)
 
         vbox = QVBoxLayout()
         vbox.addWidget(label1)
@@ -92,7 +92,7 @@ class HDFmask(QDialog):
         # self.show()
         return self._dict
 
-    def saveFile(self):
+    def saveInfos(self):
         self.close()
         # self.accept()
         # self.done(0)
