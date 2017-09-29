@@ -25,7 +25,7 @@ class Illumination:
     def __init__(self, semaphore):
         self._sem = semaphore
         self._dict = libs.dictionary.UIsettings()
-        self._analog = libs.AnalogOutput.GenerateSignal()
+        self._analog = libs.AnalogOutput.k
         self._percentHighGreen = 0
         self._percentHighRed = 0
         self._frequency = 0

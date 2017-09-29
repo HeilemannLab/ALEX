@@ -21,7 +21,9 @@ from multiprocessing import Event as mpEvent
 from multiprocessing import Queue as mpQueue
 from multiprocessing import Semaphore
 
-from PyQt5.QtWidgets import QGroupBox, QMessageBox, QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QPushButton, QStatusBar, QAction, QFileDialog, QSlider, QSpinBox, QRadioButton, QProgressBar, QLabel, QGridLayout, QLCDNumber, QLineEdit
+from PyQt5.QtWidgets import (QGroupBox, QMessageBox, QMainWindow, QVBoxLayout, QHBoxLayout,
+                             QPushButton, QStatusBar, QAction, QFileDialog, QSlider, QSpinBox,
+                             QRadioButton, QProgressBar, QLabel, QGridLayout, QLCDNumber, QLineEdit)
 from PyQt5.QtCore import Qt, pyqtSignal, QObject, pyqtSlot
 
 import libs.dictionary
@@ -35,11 +37,13 @@ import libs.saveFiles
 
 class Communicate(QObject):
     """
-    Signals make the base communication between Mainwindow and the waiter thread, which operates ProgressBar, Start/Stop and StatusBar.
-    It also does communication between Mainwindow and animation, which in return feeds the lcd panels with values.
+    Signals make the base communication between Mainwindow and the waiter thread,
+    which operates ProgressBar, Start/Stop and StatusBar. It also does communication
+    between Mainwindow and animation, which in return feeds the lcd panels with values.
 
     measurementProgress: sends the iteration from waiter to the progressBar in mainwindow
-    stopMeasurement: calls the stopBtn() method, when measurement is finite and the measurement duration ends
+    stopMeasurement: calls the stopBtn() method, when measurement is finite
+                     and the measurement duration ends
     warning: sends a warning when the count rates exceed certain value (apd dependent)
     displayRates: sends the count rates from animation to LCDDisplay in mainwindow
     """
@@ -55,18 +59,24 @@ class Communicate(QObject):
 
 class MainWindow(QMainWindow):
     """
-    Mainwindow class operates the pyqt5 window and all of its widgets. It also hosts most of the basic methods connected to the widgets.
-    There are start and stop methods, and a waiter thread that keeps an eye on the finite measurement. Settings typed by the user get stored
-    in a dictionary class and get updated before each measurement call. Mainwindow launches all of the subprocesses connecting to the daqmx cards.
-    Communication between threads and mainwindow is established via pyqtSignals, between mainwindow and subprocesses via multiprocessing queue.
+    Mainwindow class operates the pyqt5 window and all of its widgets.
+    It also hosts most of the basic methods connected to the widgets.
+    There are start and stop methods, and a waiter thread that keeps an
+    eye on the finite measurement. Settings typed by the user get stored
+    in a dictionary class and get updated before each measurement call.
+    Mainwindow launches all of the subprocesses connecting to the daqmx cards.
+    Communication between threads and mainwindow is established via
+    pyqtSignals, between mainwindow and subprocesses via multiprocessing queue.
     The main control variable for measurements is a multiprocessing event variable.
     """
     def __init__(self):
         super(MainWindow, self).__init__()
         """
-        Init hosts all the variables and UI related functionality. The following classes can not be initializes in here, because they inherit from
-        multiprocessing.Process: libs.Counter, libs.Laser and libs.dataProcesser. Arguments have to be passed by inheritance, later there's no possibility,
-        due to their separation from the main loop. libs.Animation also gets instanciated later, due to the window launching functionality in its init method.
+        Init hosts all the variables and UI related functionality. The following classes
+        can not be initializes in here, because they inherit from multiprocessing.Process: libs.Counter,
+        libs.Laser and libs.dataProcesser. Arguments have to be passed by inheritance, later there's no
+        possibility, due to their separation from the main loop. libs.Animation also gets instanciated
+        later, due to the window launching functionality in its init method.
         """
         self._dict = libs.dictionary.UIsettings()
         self._files = libs.saveFiles.SaveFiles()
@@ -131,8 +141,12 @@ class MainWindow(QMainWindow):
 
         self.menueLayout()
 
-        # File location
-        filesGroup = QGroupBox()
+        # ## GroupBox Directory:
+        # Group contains:
+        # - Location display QLineEdit
+        # - Browse directories QPushButton
+
+        filesGroup = QGroupBox('Directory')
         hbox12 = QHBoxLayout()
         filesGroup.setLayout(hbox12)
 
@@ -391,8 +405,9 @@ class MainWindow(QMainWindow):
 
     def menueLayout(self):
         """
-        Here the file menue gets evoked. The actions are widgets, which get connected to the GetFileName method.
-        It directs then to different functionality in a separate class.
+        Here the file menue gets evoked. The actions are widgets,
+        which get connected to the GetFileName method. It directs
+        then to different functionality in a separate class.
         """
         menubar = self.menuBar()
         fileMenue = menubar.addMenu('&File')
@@ -415,7 +430,6 @@ class MainWindow(QMainWindow):
     def getFileLocation(self):
         path = self.getDirectory()
         self._location.setText(path)
-        print(self._location.text())
 
     def loadDict(self):
         path = self.getFilename()
@@ -450,9 +464,11 @@ class MainWindow(QMainWindow):
 
     def refreshUI(self, changeType, changeKey, value):
         """
-        This is the first connection to the widgets. Here the widgets identify by changeType (their type) and changeKey (individual key), and pass a value.
-        The values can only be applied if the event variable self._running is set to False. Changes are processed in
-        refresher.refreshUI method, which returns a whole new dictionary.
+        This is the first connection to the widgets. Here the widgets identify
+        by changeType (their type) and changeKey (individual key), and pass a value.
+        The values can only be applied if the event variable self._running is set
+        to False. Changes are processed in refresher.refreshUI method, which returns
+        a whole new dictionary.
         :param changeType: str
         :param changeKey: str
         :param value: int or float
@@ -497,22 +513,39 @@ class MainWindow(QMainWindow):
             print("Already running!")
             self.statusBar.showMessage("Already running!")
 
+    def finalLocation(self):
+        """
+        Calls the hdf mask, from which the sample name gets retrieved. Combined with
+        actual date and time, it creates a new folder in the 'location' directory.
+        Measurements settings and hdf info get saved into that new folder as .p and
+        .txt files.
+        """
+        # Hdf information, also the sample name here is important!
+        new_folder = None
+        if self._location.text():
+            new_folder = self._files.saveRawData(self._location.text(), self._dict._a)
+        else:
+            self.statusBar.showMessage('Please select a file directory!')
+        return new_folder
+
     def startProcesses(self):
-        """
-        # Specify file location
-        f = 'C:/Users/Karoline2/Code/Alex/Measurements'
-        answer = QFileDialog.getSaveFileName(parent=self, caption='Select filename', directory=f)
-        print('1: ', type(answer[0]), answer[0])
-        folder = self._files.saveRawData(answer[0])
-        """
+        """Get folder and start all processes and threads."""
+        new_folder = self.finalLocation()
+        if new_folder is None:
+            self._running.clear()
+            return
 
         # Initialize processes and waiter thread
-        self._counter1 = libs.Counter.Counter(self._running, self._dataQ1, self._readArraySize, self._semaphore, 1)
-        self._counter2 = libs.Counter.Counter(self._running, self._dataQ2, self._readArraySize, self._semaphore, 2)
+        self._counter1 = libs.Counter.Counter(self._running, self._dataQ1, self._readArraySize,
+                                              self._semaphore, 1)
+        self._counter2 = libs.Counter.Counter(self._running, self._dataQ2, self._readArraySize,
+                                              self._semaphore, 2)
         self._laser = libs.Laser.LaserControl(self._running, self._dict, self._semaphore)
         self._anim = libs.Animation.Animation(self._animDataQ1, self._animDataQ2, self.signal)
-        self._dataProcesser1 = libs.dataProcesser.DataProcesser(self._dataQ1, self._animDataQ1, self._readArraySize, 1)
-        self._dataProcesser2 = libs.dataProcesser.DataProcesser(self._dataQ2, self._animDataQ2, self._readArraySize, 2)
+        self._dataProcesser1 = libs.dataProcesser.DataProcesser(self._dataQ1, self._animDataQ1,
+                                                                self._readArraySize, 1, new_folder)
+        self._dataProcesser2 = libs.dataProcesser.DataProcesser(self._dataQ2, self._animDataQ2,
+                                                                self._readArraySize, 2, new_folder)
         self.statusBar.showMessage("Started!")
         self._anim.run()
         self._u = Thread(target=self.waiter, args=(), name='iterator', daemon=True)
@@ -524,15 +557,19 @@ class MainWindow(QMainWindow):
         self._u.start()
         self._dataProcesser1.start()
         self._dataProcesser2.start()
-        self._anim.animate()    # this command is vicious, it seems everything after it gets delayed or not executed at all. Best always called last.
+        self._anim.animate()    # this command is vicious, it seems everything following
+                                # it gets delayed or not executed at all. Best always called last.
 
     def waiter(self):
         """
-        Illumination and APDs acquire the semaphore after initialization of tasks, the waiter waits for the semaphore to have its internal counter down to zero
-        (when als tasks are ready). Only then the waiter proceeds and does actually nothing (mode = 0 --> continuous mode) or starts the progressBar and timing
-        (mode 1 --> finite mode). In case of finite mode, the waiter stops the measurement after the duration elapses. In continuous mode, the measuremt  must
-        be stopped by the user In case of finite mode, the waiter stops the measurement after the duration elapses. In continuous mode, the measuremt  must
-        be stopped by the user..
+        Illumination and APDs acquire the semaphore after initialization of tasks,
+        the waiter waits for the semaphore to have its internal counter down to zero
+        (when als tasks are ready). Only then the waiter proceeds and does actually
+        nothing (mode = 0 --> continuous mode) or starts the progressBar and timing
+        (mode 1 --> finite mode). In case of finite mode, the waiter stops the measurement
+        after the duration elapses. In continuous mode, the measuremt  must be stopped by
+        the user In case of finite mode, the waiter stops the measurement after the
+        duration elapses. In continuous mode, the measuremt  must be stopped by the user.
         """
         while self._semaphore.get_value() > 0:
             pass
@@ -565,8 +602,9 @@ class MainWindow(QMainWindow):
     @pyqtSlot()
     def warnPopUp(self):
         """
-        Called from Animation if the count rate of one of the APDs is higher than 15000000 Hz (15Mc/s).
-        It pops up a message window, informing the user. Currently no stop mechanism is included,
+        Called from Animation if the count rate of one of the APDs is
+        higher than 15000000 Hz (15Mc/s). It pops up a message window,
+        informing the user. Currently no stop mechanism is included,
         so the user has to stop the measurement mechanically.
         """
         msg = QMessageBox()
@@ -617,11 +655,3 @@ class MainWindow(QMainWindow):
         else:
             print("not running at all!")
             self.statusBar.showMessage("Already stopped")
-
-
-if __name__ == "__main__":
-    freeze_support()
-    qApp = QApplication(sys.argv)
-    aw = MainWindow()
-    aw.show()
-    sys.exit(qApp.exec_())

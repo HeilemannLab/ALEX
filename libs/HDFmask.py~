@@ -50,7 +50,7 @@ class HDFmask(QDialog):
         line6 = QLineEdit()
         line6.setPlaceholderText(self._dict["description"])
         line8 = QLineEdit()
-        line8.setPlaceholderText(self._dict["num_dyes"])
+        line8.setPlaceholderText(str(self._dict["num_dyes"]))
 
         line1.textChanged.connect(lambda: self.setitem("author", line1.text()))
         line2.textChanged.connect(lambda: self.setitem("author_affiliation", line2.text()))

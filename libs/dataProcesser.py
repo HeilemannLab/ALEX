@@ -21,7 +21,7 @@ class DataProcesser(Process):
     and features fast write rates and good compression. So overfilling the RAM is avoided and the data is secured.
     The files get stored in a loaction specified by the user.
     """
-    def __init__(self, dataQ, animDataQ, readArraySize, N):
+    def __init__(self, dataQ, animDataQ, readArraySize, N, folder):
         """
         @param dataQ: multiprocessing queue
         @param animDataQ: multiprocessing queue
@@ -34,6 +34,7 @@ class DataProcesser(Process):
         self._readArraySize = readArraySize
         self._animDataQ = animDataQ
         self._N = N
+        self._folder = folder
         self._timestamps = np.zeros([1, 2], dtype=int)
 
     def run(self):
@@ -45,7 +46,7 @@ class DataProcesser(Process):
         Count rate entry/dt is send via animDataQ and lcdQ. Array gets appended to hdf file array, stored as temp.
         """
         int_max = (2**32) - 1
-        filename = "smALEX_APD{}.hdf".format(self._N)
+        filename = str(self._folder / "smALEX_APD{}.hdf".format(self._N))
         f = tables.open_file(filename, mode='w')
         atom = tables.UInt32Atom()
         filters = tables.Filters(complevel=6, complib='zlib')
