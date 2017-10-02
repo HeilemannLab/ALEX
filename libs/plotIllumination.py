@@ -11,18 +11,18 @@
 #####################################################################'''
 import numpy as np
 from matplotlib import pyplot as plt
-import libs.dictionary
+import libs.UIsettings
 # from matplotlib.backends.backend_pdf import PdfPages
 
 
-class plotIllumination:
+class PlotIllumination:
     """
     This class is a simple print tool. It collects the laser settings and print a similar
     plot to a .png file. This should be saved everytime a dataset from a measurement gets
     saved.
     """
     def __init__(self):
-        self._dict = libs.dictionary.UIsettings()
+        self._dict = libs.UIsettings.UIsettings()
         self._t = np.arange(0, 101, 1)
         self._green = np.zeros([101])
         self._red = np.zeros([101])
@@ -31,7 +31,7 @@ class plotIllumination:
         self._redAmp = 0
 
     def refreshSettings(self, dictionary):
-        self._dict_a = dictionary
+        self._dict_a.update(dictionary)
 
     def plot(self, filename):
         """

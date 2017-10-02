@@ -36,7 +36,7 @@ class Counter(Process):
         self._data = np.zeros([self._readArraySize, 2], dtype=int)
         self._sem = semaphore
         self._N = N
-        self._apd = libs.APD.TimestampingCounters(self._readArraySize, self._N, self._sem)
+        self._apd = libs.APD.APD(self._readArraySize, self._N, self._sem)
 
     def run(self):
         """

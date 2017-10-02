@@ -14,7 +14,7 @@ import ctypes
 import numpy as np
 
 
-class TimestampingCounters:
+class APD:
     """
     This class generates the interface to the 6612 card, in detail the counter input tasks. The 6612 card should be 'Device 2'.
     """

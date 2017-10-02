@@ -9,12 +9,12 @@
 # Department: Single Molecule Biophysics
 # License: GPL3
 #####################################################################'''
-import libs.Illumination
+import libs.DigitalSignal
 import libs.Timing
 from multiprocessing import Process
 
 
-class LaserControl(Process):
+class Laser(Process):
     """
     The laser class is a subclass of multiprocessing.Process. It serves to run the
     illumination class as long as the measurements takes place. It also starts and
@@ -26,11 +26,11 @@ class LaserControl(Process):
         @param dictionary: dictionary class instance
         @param semaphore: multiprocessing Semaphore
         """
-        super(LaserControl, self).__init__()
+        super(Laser, self).__init__()
         self.daemon = True
         self._sem = semaphore
-        self._laser = libs.Illumination.Illumination(semaphore)
-        self._timing = libs.Timing.SampleClock()
+        self._laser = libs.DigitalSignal.DigitalSignal(semaphore)
+        self._timing = libs.Timing.Timing()
         self._running = running
         self._dict = dictionary
 

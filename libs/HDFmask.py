@@ -85,17 +85,14 @@ class HDFmask(QDialog):
 
     def maskWindow(self, dictionary=None):
         if dictionary is None:
-            pass
+            print('Dict is None')
         else:
             self._dict.update(dictionary)
         self.exec_()
-        # self.show()
         return self._dict
 
     def saveInfos(self):
         self.close()
-        # self.accept()
-        # self.done(0)
 
     def setitem(self, key, value):
         self._dict[key] = value

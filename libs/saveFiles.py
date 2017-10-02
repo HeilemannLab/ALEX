@@ -12,11 +12,11 @@
 import time
 import numpy as np
 import tables
-import libs.dictionary
+import libs.UIsettings
 import pickle
-import libs.plotIllumination
+import libs.PlotIllumination
 import libs.HDFmask
-import libs.saveHDF
+import libs.SaveHDF
 import pathlib
 
 
@@ -29,10 +29,10 @@ class SaveFiles:
     corresponding detector mask.
     """
     def __init__(self):
-        self._dict = libs.dictionary.UIsettings()
-        self._plot = libs.plotIllumination.plotIllumination()
+        self._dict = libs.UIsettings.UIsettings()
+        self._plot = libs.PlotIllumination.PlotIllumination()
         self._mask = libs.HDFmask.HDFmask()
-        self._saveHDF = libs.saveHDF.saveHDF5()
+        self._saveHDF = libs.SaveHDF.SaveHDF()
         self._hdf_dict = None
 
     def refreshSettings(self, dictionary):
@@ -42,14 +42,15 @@ class SaveFiles:
         """
         self._dict._a.update(dictionary)
 
-    def correctRollover(self, N):
+    def correctRollover(self, path, N):
         """
         Correct rollover in the file. It avoids reading all the items into the RAM this way.
+        @param path: str
         @param N: int
         """
         t_start = time.time()
         int_32 = (2**32) - 1
-        filename = "smALEX_APD{}.hdf".format(N)
+        filename = str(path / "smALEX_APD{}.hdf".format(N))
         f = tables.open_file(filename, 'a')
         f.root.timestamps[:, 0] = f.root.timestamps[:, 0] + (int_32 * f.root.timestamps[:, 1])
         f.flush()   # do not know yet why one needs that, maybe clears allocated RAM
@@ -88,7 +89,7 @@ class SaveFiles:
         # self._plot.plot(str(folder) + '/Illumination_scheme.png')
         return folder    # folder must be returned to give it to the dataprocessers
 
-    def ConvertToPhotonHDF5(self, files):
+    def ConvertToPhotonHDF5(self, path):
         """
         This function does the converting from simple hdf5 files in one nice
         photon-hdf5 file fit for usage with Fretbursts. First the arrays get corrected
@@ -98,34 +99,38 @@ class SaveFiles:
         metadata, checked for validity and saved as photon-hdf5 file.
         @param filename: str
         """
+        path = pathlib.Path(path)
+
+        # open to append rest oft required dict and convert to photon-hdf5
+        dictionary = self.loadSetsDict(path / 'HDF_additional_info.p')
+        print("loaded mask dict: ", dictionary)
+        self._mask._dict = self._mask.maskWindow(dictionary)
+
         # Rollover correction
-        self.correctRollover(1)
-        self.correctRollover(2)
+        self.correctRollover(path, 1)
+        self.correctRollover(path, 2)
 
         # The arrays have to be written to the RAM, because currently the merging only happens
         # in the RAM, until there's a solution writing on the hdf files only.
         # array 1
-        f1 = tables.open_file('smALEX_APD1.hdf', 'r')
+        f1 = tables.open_file(str(path / 'smALEX_APD1.hdf'), 'r')
         rows1 = f1.root.timestamps[:, 0]
         f1.flush()
         f1.close()
 
         # array 2
-        f2 = tables.open_file('smALEX_APD2.hdf', 'r')
+        f2 = tables.open_file(str(path / 'smALEX_APD2.hdf'), 'r')
         rows2 = f2.root.timestamps[:, 0]
         f2.flush()
         f2.close()
 
         # merge the two arrays into one, create detector mask
         data, detector_mask = self.merge_timestamps(rows1, rows2)
-
-        # open to append rest oft required dict and convert to photon-hdf5
         self._mask._dict["timestamps_reference"] = data
         self._mask._dict["detectors_reference"] = detector_mask
-        # self._mask._dict["acquisition_duration"] = self._dict._a["Duration"]
 
         self._saveHDF.assembleDictionary(self._mask._dict)
-        self._saveHDF.saveAsHDF(filename)
+        self._saveHDF.saveAsHDF(str(path / 'smALEX.hdf'))
         print("Data stored in photon-hdf5.")
 
     def merge_timestamps(self, t1, t2):
@@ -181,17 +186,17 @@ class SaveFiles:
 
     def loadSetsDict(self, path):
         """
-        Loads the dictionary containing measurement settings from a .p pickle file
-        and returns a dictionary.
-        @param fname: str
+        Loads a dictionary from a .p pickle file
+        and returns it.
+        @param path: string
         """
         dictionary = None
         path = pathlib.Path(path)
-        if not path.is_file():
-            print("Error: Empty file or no valid .p file")
-        else:
+        if path.is_file():
             with path.open("rb") as f:
                 dictionary = pickle.load(f)
+        else:
+            print("Error: Empty file or no valid .p file")
         return dictionary
 
 if __name__ == '__main__':

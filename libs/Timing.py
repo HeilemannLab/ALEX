@@ -10,17 +10,17 @@
 # License: GPL3
 #####################################################################'''
 from PyDAQmx import *
-import libs.dictionary
+import libs.UIsettings
 
 
-class SampleClock:
+class Timing:
     """
     This class configures the pulse train, which serves as trigger signal.
     Maybe it could be changed to a single edge. The pulse is created on
     the 6713 card, which should be 'Device 1'.
     """
     def __init__(self):
-        self._dict = libs.dictionary.UIsettings()
+        self._dict = libs.UIsettings.UIsettings()
         self._timingPuls = None
         self._freq = 0
 

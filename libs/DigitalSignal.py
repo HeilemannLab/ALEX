@@ -10,11 +10,11 @@
 # License: GPL3
 #####################################################################'''
 from PyDAQmx import *
-import libs.dictionary
-import libs.AnalogOutput
+import libs.UIsettings
+import libs.AnalogSignal
 
 
-class Illumination:
+class DigitalSignal:
     """
     The Illumination class serves the purpose to create the laser alternation pattern as a digital signal,
     which can then be used to control the AOTF. Also the digital silencer pulse for the APDs is generated here.
@@ -24,8 +24,8 @@ class Illumination:
     """
     def __init__(self, semaphore):
         self._sem = semaphore
-        self._dict = libs.dictionary.UIsettings()
-        self._analog = libs.AnalogOutput.IntensitySignal()
+        self._dict = libs.UIsettings.UIsettings()
+        self._analog = libs.AnalogSignal.AnalogSignal()
         self._percentHighGreen = 0
         self._percentHighRed = 0
         self._frequency = 0

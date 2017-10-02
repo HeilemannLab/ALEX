@@ -9,7 +9,7 @@
 # Department: Single Molecule Biophysics
 # License: GPL3
 #####################################################################'''
-import libs.dictionary
+import libs.UIsettings
 
 
 class Refresh:
@@ -18,7 +18,7 @@ class Refresh:
     like sliders with their corresponding spinbox.
     """
     def __init__(self):
-        self._dict = libs.dictionary.UIsettings()
+        self._dict = libs.UIsettings.UIsettings()
 
     def refreshUI(self, changeType, changeKey, value):
         """
@@ -34,7 +34,7 @@ class Refresh:
         if changeType == 2:
             # self.changeRadioButton(changeKey)   # check if this here is necessary)
             self.changeRadioButton(value)
-        if changeType ==3:
+        if changeType == 3:
             self._dict._a = changeKey
         return self._dict._a
 

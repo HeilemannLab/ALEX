@@ -10,10 +10,9 @@
 # License: GPL3
 #####################################################################'''
 import phconvert as phc
-# import numpy as np
 
 
-class saveHDF5:
+class SaveHDF:
     """
     This class should serve as tool to create a fully functional photon-HDF file. It is based upon
     the notebook example from phconvert by Antonino Ingargiola, but slightly changed. The data, specs
@@ -21,8 +20,11 @@ class saveHDF5:
     The main method 'save_photon_hdf5' is stated to be applicable to an open hdf-file. Lastly the file gets
     checked by 'assert_valid_photon_hdf5' method.
     """
+    def __init__(self):
+        self._dictionary = dict()
+        self._data = dict()
+
     def assembleDictionary(self, dictionary):
-        self._dictionary = dictionary
         """
         Note to 'save_photon_hdf' method:
         The argument 'h5file' accepts an already open HDF5 file for storage.
@@ -36,10 +38,13 @@ class saveHDF5:
         CArray or EArray) will be left unmodified. In either cases the TITLE
         attribute is always updated.
         """
+        self._dictionary.update(dictionary)
+
         # Data references from the open file
         timestamps = self._dictionary["timestamps_reference"]
         detectors = self._dictionary["detectors_reference"]
-        timestamps_unit = int(10**(-8))
+        timestamps_unit = int(1e-8)   # tried (10**(-8)), failed
+
         # Measurements specs to go into photon data group
         measurement_specs = dict(measurement_type='smFRET-usALEX',
                                  alex_period=4000,
@@ -87,13 +92,20 @@ class saveHDF5:
                           sample=sample)
 
     def saveAsHDF(self, filename):
+        """
+        Saves as photon-HDF. It adds a lot of additional information.
+        The content then gets checked, verbose=True outputs all of the
+        checkings.
+        @param filename: str
+        """
         # save in photon-hdf5 file
         phc.hdf5.save_photon_hdf5(data_dict=self._data,
                                   h5_fname=filename,
-                                  overwrite=False)
+                                  overwrite=False,
+                                  close=True)
         print("Saved.")
 
         # check the new file
-        # filename = str(self._dictionary["filename"] + '.hdf5')
-        phc.hdf5.assert_valid_photon_hdf5(filename)
+        phc.hdf5.assert_valid_photon_hdf5(filename, verbose=True)
         print("Checked.")
+        return

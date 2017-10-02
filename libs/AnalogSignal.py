@@ -12,10 +12,10 @@
 import numpy as np
 import time
 from PyDAQmx import *
-import libs.dictionary
+import libs.UIsettings
 
 
-class IntensitySignal:
+class AnalogSignal:
     """
     The AnalogOutput class makes the connection to the DAQmx card 6713 (which should be device 1 in NI MAX).
     Laser power sets the voltage height to a percentage between 0V and 5V. Stop method contains a short task
@@ -24,7 +24,7 @@ class IntensitySignal:
     """
     def __init__(self):
         self._sampPoints = 2
-        self._dict = libs.dictionary.UIsettings()
+        self._dict = libs.UIsettings.UIsettings()
         self._freq = self._dict._a["laser frequency"]
         self._red = np.zeros([2])
         self._green = np.zeros([2])
@@ -60,17 +60,17 @@ class IntensitySignal:
         self.Intensities()
         self._analog_output = Task()
         self._analog_output.CreateAOVoltageChan(physicalChannel="Dev1/ao0",
-                                               nameToAssignToChannel="",
-                                               minVal=-10.0,
-                                               maxVal=10.0,
-                                               units=DAQmx_Val_Volts,
-                                               customScaleName=None)
+                                                nameToAssignToChannel="",
+                                                minVal=-10.0,
+                                                maxVal=10.0,
+                                                units=DAQmx_Val_Volts,
+                                                customScaleName=None)
         self._analog_output.CreateAOVoltageChan(physicalChannel="Dev1/ao1",
-                                               nameToAssignToChannel="",
-                                               minVal=-10.0,
-                                               maxVal=10.0,
-                                               units=DAQmx_Val_Volts,
-                                               customScaleName=None)
+                                                nameToAssignToChannel="",
+                                                minVal=-10.0,
+                                                maxVal=10.0,
+                                                units=DAQmx_Val_Volts,
+                                                customScaleName=None)
 
         self._analog_output.CfgSampClkTiming(source="",
                                              rate=self._freq,
