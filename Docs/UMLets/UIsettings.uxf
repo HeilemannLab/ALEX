@@ -10,7 +10,7 @@
       <h>140</h>
     </coordinates>
     <panel_attributes>UIsettings
-dictionary.py
+UIsettings.py
 --
 - a: dict
 - self._a: dict

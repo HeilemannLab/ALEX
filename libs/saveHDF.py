@@ -47,10 +47,10 @@ class SaveHDF:
 
         # Measurements specs to go into photon data group
         measurement_specs = dict(measurement_type='smFRET-usALEX',
-                                 alex_period=4000,
+                                 alex_period=self._dictionary["alex_period"],       # in fretbursts example it is 4000
                                  alex_offset=700,
-                                 alex_excitation_period1=[100, 1900],
-                                 alex_excitation_period2=[2100, 3900],
+                                 alex_excitation_period1=self._dictionary["period1"],   # example: [100, 1900]
+                                 alex_excitation_period2=self._dictionary["period2"],   # example: [2100, 3900]
                                  detectors_specs={'spectral_ch1': [0],             # list of donor's detector IDs, check if that's the correct assignment
                                                   'spectral_ch2': [1]})            # list of acceptor's detector IDs
         # This section should already be there

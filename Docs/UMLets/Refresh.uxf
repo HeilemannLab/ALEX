@@ -7,12 +7,16 @@
       <x>20</x>
       <y>20</y>
       <w>340</w>
-      <h>150</h>
+      <h>220</h>
     </coordinates>
     <panel_attributes>Refresh
 Refresher.py
 --
 - _sets: dict
+- changeKey: str
+- changeType: str
+- value: float
+- b: pyqt.RadioButton
 --
 - __init__()
 - refreshUI(str changeType, str changeKey, float value)

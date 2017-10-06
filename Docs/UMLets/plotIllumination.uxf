@@ -12,7 +12,7 @@
     <panel_attributes>plotIllumination
 plotIllumination.py
 --
-- _dict: libs.dictionary.UIsettings
+- _dict: libs.UIsettings.UIsettings
 - _t: ndarray
 - _green: ndarray
 - _red: ndarray
@@ -22,7 +22,7 @@ plotIllumination.py
 --
 - __init__()
 - refreshSettings(dict dictionary)
-- plot(string fname)</panel_attributes>
+- plot(string filename)</panel_attributes>
     <additional_attributes/>
   </element>
 </diagram>

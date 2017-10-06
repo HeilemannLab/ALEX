@@ -7,11 +7,11 @@
       <x>20</x>
       <y>20</y>
       <w>530</w>
-      <h>310</h>
+      <h>320</h>
     </coordinates>
     <panel_attributes>DataProcesser
 multiprocessing.Process
-dataProcesser.py
+DataProcesser.py
 --
 - daemon: bool
 - _dataQ: multiprocessing.Queue
@@ -19,6 +19,7 @@ dataProcesser.py
 - _resultQ: multiprocessing.Queue
 - _readArraySize: int
 - _N: int
+- _folder: WindowsPath
 - _timestamps: ndarray
 - array: object
 - n1: float

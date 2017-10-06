@@ -14,21 +14,16 @@ from PyQt5.QtWidgets import QLineEdit, QLabel, QVBoxLayout, QPushButton, QDialog
 
 class HDFmask(QDialog):
     """
-    This class provides a raw interface to fill in the additional information, which is required to
+    This class provides a small interface to fill in the additional information, which is required to
     get a nice photon-HDF file. This library can be accessed from 'save Data' and 'Convert Data'.
     Always create a class instance and execute the window by calling 'instance.maskWindow()'. It is
     possible to pass an old dictionary.
     """
     def __init__(self):
         super(HDFmask, self).__init__()
-        self._dict = {"author_affiliation": "Institute for Physical and Theoretical Chemistry, Goethe-University Frankfurt",
-                      "author": "Your name",
-                      "sample_name": "Sample",
-                      "buffer_name": "Buffer",
-                      "dye_names": "Dye names, seperated by comma",
-                      "description": "Detailed description",
-                      "num_dyes": int(2)}
+        self._dict = dict()
 
+    def initWindow(self):
         label1 = QLabel("Author")
         label2 = QLabel("Institute")
         label3 = QLabel("Sample name")
@@ -42,6 +37,9 @@ class HDFmask(QDialog):
         line2 = QLineEdit()
         line2.setPlaceholderText(self._dict["author_affiliation"])
         line3 = QLineEdit()
+        line3.setToolTip("Combined with the date and time, the sample"
+                         " name will be the folder where you can find all"
+                         " data. Please dont use '/', '%', '&' or spaces.")
         line3.setPlaceholderText(self._dict["sample_name"])
         line4 = QLineEdit()
         line4.setPlaceholderText(self._dict["buffer_name"])
@@ -50,6 +48,7 @@ class HDFmask(QDialog):
         line6 = QLineEdit()
         line6.setPlaceholderText(self._dict["description"])
         line8 = QLineEdit()
+        line8.setToolTip("Please type in integers! '1', '2' or '10', but never 'one' or 'three'!")
         line8.setPlaceholderText(str(self._dict["num_dyes"]))
 
         line1.textChanged.connect(lambda: self.setitem("author", line1.text()))
@@ -61,7 +60,7 @@ class HDFmask(QDialog):
         line8.textChanged.connect(lambda: self.setitem("num_dyes", int(line8.text())))
 
         saveButton = QPushButton("Save")
-        saveButton.clicked.connect(self.saveInfos)
+        saveButton.clicked.connect(self.close)
 
         vbox = QVBoxLayout()
         vbox.addWidget(label1)
@@ -81,18 +80,23 @@ class HDFmask(QDialog):
         vbox.addWidget(saveButton)
 
         self.setLayout(vbox)
-        self.setWindowTitle("Additional measurements informations")
+        self.setWindowTitle("Additional measurement informations")
 
-    def maskWindow(self, dictionary=None):
+    def maskWindow(self, dictionary):
         if dictionary is None:
-            print('Dict is None')
+            self._dict = {"author_affiliation": "Institute for Physical and Theoretical Chemistry, Goethe-University Frankfurt",
+                          "author": "Your name",
+                          "sample_name": "Sample",
+                          "buffer_name": "Buffer",
+                          "dye_names": "Dye names, seperated by comma",
+                          "description": "Detailed description",
+                          "num_dyes": int(2)}
         else:
             self._dict.update(dictionary)
+        print("dict: ", self._dict)
+        self.initWindow()
         self.exec_()
         return self._dict
-
-    def saveInfos(self):
-        self.close()
 
     def setitem(self, key, value):
         self._dict[key] = value

@@ -1,0 +1,8 @@
+Parameters:
+laser percentageG	47.0
+lpower green	0
+laser frequency	100
+lpower red	0
+laser percentageR	53
+Duration	30
+Radio	1

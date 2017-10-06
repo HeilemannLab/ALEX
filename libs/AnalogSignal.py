@@ -17,10 +17,12 @@ import libs.UIsettings
 
 class AnalogSignal:
     """
-    The AnalogOutput class makes the connection to the DAQmx card 6713 (which should be device 1 in NI MAX).
-    Laser power sets the voltage height to a percentage between 0V and 5V. Stop method contains a short task
-    that sets the channel to zero. It's necessary because tasks would sometimes not go back to zero in idle position.
-    The voltages get delivered to pins 22 'Dev1/ao0' (Red) and 21 'Dev1/ao1' (Green).
+    The AnalogOutput class makes the connection to the DAQmx card 6713
+    (which should be device 1 in NI MAX). Laser power sets the voltage
+    height to a percentage between 0V and 5V. Stop method contains a short
+    task that sets the channel to zero. It's necessary because tasks would
+    sometimes not go back to zero in idle position. The voltages get delivered
+    to pins 22 'Dev1/ao0' (Red) and 21 'Dev1/ao1' (Green).
     """
     def __init__(self):
         self._sampPoints = 2
@@ -39,10 +41,12 @@ class AnalogSignal:
 
     def Intensities(self):
         """
-        The laser powers get extracted from the dictionary and converted to values between 0V and 5V.
-        The data arrays consist of two values, which are overwritten with the new laser power values.
-        Due to bundling of the tasks, the arrays must be concatenated. The data gets written to the
-        channels in the order as they are stacked respectively.
+        The laser powers get extracted from the dictionary and
+        converted to values between 0V and 5V. The data arrays
+        consist of two values, which are overwritten with the
+        new laser power values. Due to bundling of the tasks,
+        the arrays must be concatenated. The data gets written
+        to the channels in the order as they are stacked respectively.
         """
         self._redAmp = self._dict._a["lpower red"]
         self._greenAmp = self._dict._a["lpower green"]
@@ -53,9 +57,10 @@ class AnalogSignal:
 
     def InitAnalog(self):
         """
-        Analog tasks can be bundled and written with one sampling signal. The data is written to the
-        channels in the order of the channels are created in the task. Sampling settings are internal
-        clock and the laser alterantion frequency.
+        Analog tasks can be bundled and written with one sampling signal.
+        The data is written to the channels in the order of the channels
+        are created in the task. Sampling settings are internal clock and
+        the laser alterantion frequency.
         """
         self.Intensities()
         self._analog_output = Task()
@@ -93,7 +98,8 @@ class AnalogSignal:
 
     def stopAnalog(self):
         """
-        After stopping the measurement task, another short task is started and stopped immediately, to make sure
+        After stopping the measurement task, another short
+        task is started and stopped immediately, to make sure
         that the channels are savely set back to zero.
         """
         self._analog_output.StopTask()

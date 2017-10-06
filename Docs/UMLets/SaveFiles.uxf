@@ -12,21 +12,21 @@
     <panel_attributes>SaveFiles
 saveFiles.py
 --
-- _dict: libs.dictionary.UIsettings
-- _plot: libs.plotIllumination.plotIllumination
+- _dict: libs.UIsettings.UIsettings
+- _plot: libs.PlotIllumination.PlotIllumination
 - _mask = libs.HDFmask.HDFmask
-- _saveHDF = libs.saveHDF.saveHDF5
+- _saveHDF = libs.SaveHDF.SaveHDF5
+- _hdf_dict: dictionary
 --
 - __init__()
 - refreshSettings(dict dictionary)
-- SortTasks(string keyword, filehandler filename)
-- correctRollover(int N)
-- saveRawData(str directory, str tag)
+- correctRollover(str path, int N)
+- saveRawData(str path, dict settings)
+- ConvertToPhotonHDF5(str path)
 - saveHdfDict(dict dictionary, str folder, str filename)
-- saveSetsDict(str folder, str filename)
+- saveSetsDict(dict dictionary, str folder, str filename)
 - loadSetsDict(str path)
-- merge_timestamps(ndarray t1, ndarray t2)
-- addArrays(str filename)</panel_attributes>
+- merge_timestamps(ndarray t1, ndarray t2)</panel_attributes>
     <additional_attributes/>
   </element>
 </diagram>

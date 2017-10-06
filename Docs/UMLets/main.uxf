@@ -9,7 +9,8 @@
       <w>210</w>
       <h>100</h>
     </coordinates>
-    <panel_attributes>main
+    <panel_attributes>Main
+Main.py
 --
 - app: QApplication
 - mainWindow: mainwindow.MainWindow

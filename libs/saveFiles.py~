@@ -29,11 +29,11 @@ class SaveFiles:
     corresponding detector mask.
     """
     def __init__(self):
+        self._hdf_dict = None
         self._dict = libs.UIsettings.UIsettings()
         self._plot = libs.PlotIllumination.PlotIllumination()
         self._mask = libs.HDFmask.HDFmask()
         self._saveHDF = libs.SaveHDF.SaveHDF()
-        self._hdf_dict = None
 
     def refreshSettings(self, dictionary):
         """
@@ -61,22 +61,34 @@ class SaveFiles:
 
     def saveRawData(self, path, settings):
         """
-        The directory gets specified by user and named by the tag. Then a special folder gets created.
-        This should happen before the measurement starts. Also the used settings should be saved in this folder,
-        before the measurement. This way it's guaranteed that the used settings are saved, even if the user
+        The directory gets specified by user and named by the tag. Then a special
+        folder gets created. This should happen before the measurement starts. Also
+        the used settings should be saved in this folder, before the measurement.
+        This way it's guaranteed that the used settings are saved, even if the user
         changes settings during the measurement.
         @param path: str
         @param settings: dict
         """
         # Start whith assembling the hdf info, import here will be the sample name,
-        # as it is used for the folder where all files get saved into
+        # as it is used for the folder where all files get saved into. Also data
+        # between the dicts get shared: Important ist the ALEX period in its whole
+        # and the illumination percentages. In fretbursts they are called 'alex period',
+        # 'alex_excitation_period1' and 'alex_excitation_period2'. Those must be given
+        # in unit of timestamps, say 10ns.
         self.refreshSettings(settings)
+        whole_period = np.floor((self._dict._a["frequency"]) / (1e-08))
+        period1 = np.floor(whole_period * (self._dict._a["laser percentageG"]))
+
         self._hdf_dict = self._mask.maskWindow(self._hdf_dict)
+        self._hdf_dict["alex_period"] = whole_period
+        self._hdf_dict["period1"] = [10, period1 - 10]
+        self._hdf_dict["period2"] = [period1 + 10, whole_period - 10]
+
         folder = self._hdf_dict["sample_name"] + time.strftime('_%Y_%m_%d_%H_%M')
         path = pathlib.Path(path)
         folder = path / folder
         if folder.exists():
-            folder / '_(1)'
+            folder = folder / '_(1)'
         else:
             pass
         folder.mkdir()
@@ -89,7 +101,7 @@ class SaveFiles:
         # self._plot.plot(str(folder) + '/Illumination_scheme.png')
         return folder    # folder must be returned to give it to the dataprocessers
 
-    def ConvertToPhotonHDF5(self, path):
+    def convertToPhotonHDF5(self, path):
         """
         This function does the converting from simple hdf5 files in one nice
         photon-hdf5 file fit for usage with Fretbursts. First the arrays get corrected
@@ -97,21 +109,24 @@ class SaveFiles:
         (maybe check size) merged and sorted, and the created one and its corresponding
         detector mask are written into a new hdf file. This one then gets enriched with
         metadata, checked for validity and saved as photon-hdf5 file.
-        @param filename: str
+        @param path: str
         """
         path = pathlib.Path(path)
 
         # open to append rest oft required dict and convert to photon-hdf5
+        self._hdf_dict = dict()
         dictionary = self.loadSetsDict(path / 'HDF_additional_info.p')
-        print("loaded mask dict: ", dictionary)
-        self._mask._dict = self._mask.maskWindow(dictionary)
+        print("\ndictionary: ", dictionary)
+        self._hdf_dict = self._mask.maskWindow(dictionary)
+        print("\nhdf_dict: ", self._hdf_dict)
 
         # Rollover correction
         self.correctRollover(path, 1)
         self.correctRollover(path, 2)
 
-        # The arrays have to be written to the RAM, because currently the merging only happens
-        # in the RAM, until there's a solution writing on the hdf files only.
+        # The arrays have to be written to the RAM, because currently the merging
+        # only happens in the RAM, until there's a solution writing on the hdf
+        # files only.
         # array 1
         f1 = tables.open_file(str(path / 'smALEX_APD1.hdf'), 'r')
         rows1 = f1.root.timestamps[:, 0]
@@ -124,21 +139,24 @@ class SaveFiles:
         f2.flush()
         f2.close()
 
-        self._mask._dict["timestamps_reference"] = data
-        self._mask._dict["detectors_reference"] = detector_mask
-
         # merge the two arrays into one, create detector mask
+        # and add references to 'data' and 'detector_mask' into
+        # the dictionary which goes into the dictionary
         data, detector_mask = self.merge_timestamps(rows1, rows2)
+        self._hdf_dict["timestamps_reference"] = data
+        self._hdf_dict["detectors_reference"] = detector_mask
 
-        self._saveHDF.assembleDictionary(self._mask._dict)
+        self._saveHDF.assembleDictionary(self._hdf_dict)
         self._saveHDF.saveAsHDF(str(path / 'smALEX.hdf'))
         print("Data stored in photon-hdf5.")
 
     def merge_timestamps(self, t1, t2):
         """
-        This method merges the timestamp arrays into one, so it fits to the needs of Fretbursts. In order
-        to maintain the information, which timestamp came from which detector, a detector mask is created.
-        Returns two ndarrays with sorted timestamps 'tm' and detector ID mask 'mask_t2'.
+        This method merges the timestamp arrays into one, so it fits to
+        the needs of Fretbursts. In order to maintain the information,
+        which timestamp came from which detector, a detector mask is created.
+        Returns two ndarrays with sorted timestamps 'tm' and detector ID mask
+        'mask_t2'.
         @param t1: ndarray
         @param t2: ndarray
         """
@@ -199,8 +217,3 @@ class SaveFiles:
         else:
             print("Error: Empty file or no valid .p file")
         return dictionary
-
-if __name__ == '__main__':
-    filename = 'saveFiletester.hdf'
-    a = SaveFiles()
-    a.saveDataToHDF5(filename)

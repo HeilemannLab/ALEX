@@ -16,10 +16,12 @@ import seaborn as sns
 
 class Animation:
     """
-    Animation class is designed specially to make the matplotlib.animation.FuncAnimation method work.
-    The plots are Line2D graphs, also data can be plotted in two subplots ('plot2'),
-    or in one ('plot') as it's usual for FRET. The 'upfateAnimation' also feeds data to the LCD Panels
-    in the mainwindow via pyqtSignal.
+    Animation class is designed specially to make the
+    matplotlib.animation.FuncAnimation method work. The plots
+    are Line2D graphs, also data can be plotted in two subplots
+    ('plot2'), or in one ('plot') as it's usual for FRET. The
+    'updateAnimation' also feeds data to the LCD Panels in the
+    mainwindow via pyqtSignal.
     """
     def __init__(self, animDataQ1, animDataQ2, signal):
         """
@@ -41,12 +43,16 @@ class Animation:
         self._axLimit = 1e8
 
     def run(self):
-        """To start animation a run method is necessary. Therefore it's most certainly a threading.Thread subclass."""
+        """
+        To start animation a run method is necessary. Therefore
+        it's most certainly a threading.Thread subclass.
+        """
         self.plot()
 
     def plot(self):
         """
-        This plot function provides one plot, where both datasets are plotted into. The red APD data is multiplied with -1.
+        This plot function provides one plot, where both datasets
+        are plotted into. The red APD data is multiplied with -1.
         The style is a seaborn one.
         """
         # pyplot.style.use('seaborn-deep')
@@ -66,7 +72,10 @@ class Animation:
         ax.set_ylabel("counts/sec")
 
     def plot2(self):
-        """This plot function provides two subplots with the red channel data on the second plotting it in negative direction."""
+        """
+        This plot function provides two subplots with the red
+        channel data on the second plotting it in negative direction.
+        """
         pyplot.style.use('seaborn-deep')
 
         ax_green = self._figure.add_subplot(2, 1, 1)
@@ -92,13 +101,15 @@ class Animation:
         ax_red.set_title("Red channel")
 
         # pyplot.tight_layout(pad=0.4, w_pad=0.5, h_pad=1.0)
-        self._figure.subplots_adjust(left=0.2, bottom=0.1, right=0.8, top=0.9, wspace=0.1, hspace=0.8)
+        self._figure.subplots_adjust(left=0.2, bottom=0.1, right=0.8,
+                                     top=0.9, wspace=0.1, hspace=0.8)
 
     def initAnimation(self):
         """
-        'initAnimation' creates the initial Window for the 'funcAnimation' method.
-        It it passed as a parameter, but it's optional, so this can be skipped.
-        But note that the LinePlot has to be initialized then otherwise.
+        'initAnimation' creates the initial Window for the
+        'funcAnimation' method. It it passed as a parameter,
+        but it's optional, so this can be skipped. But note
+        that the LinePlot has to be initialized then otherwise.
         """
         self._greenLine.set_data([], [])
         self._redLine.set_data([], [])
@@ -106,11 +117,13 @@ class Animation:
 
     def updateAnimation(self, i):
         """
-        The data is retrieved from the queues in an try/except block to avoid errors/blocking.
-        In there also the signal 'displayRates' gets emitted with a two-item-list[green, red].
+        The data is retrieved from the queues in an try/except
+        block to avoid errors/blocking. In there also the signal
+        'displayRates' gets emitted with a two-item-list[green, red].
         @param i: iterable
-        This parameter is necessary for the animation, it passes the 'frames' argument as an iterator somehow.
-        Documtation does not entirely reveal how this works.
+        This parameter is necessary for the animation, it passes the
+        'frames' argument as an iterator somehow. Documtation does
+        not entirely reveal how this works.
         """
         if self._tdata[-1] > 10:
             self._tdata = [0]
@@ -121,7 +134,7 @@ class Animation:
         try:
             green = float(1e8) * self._animDataQ1.get(timeout=1.0)
             red = float(1e8) * (-1) * self._animDataQ2.get(timeout=1.0)
-            x = [int(green), int(-1 * red)]   # Do not know if the '- red' will actually work
+            x = [int(green), int(-1 * red)]
             self._signal.displayRates.emit(x)
             if (green >= 15000000) or ((-1 * red) >= 15000000):
                 self._signal.warning.emit()
@@ -139,9 +152,16 @@ class Animation:
 
     def animate(self):
         """
-        FuncAnimation updates #(frames), in #(interval) milliseconds. It's using blitting, therefore the axis will not get updated.
+        FuncAnimation updates #(frames), in #(interval) milliseconds.
+        It's using blitting, therefore the axis will not get updated.
         """
-        self.anim = animation.FuncAnimation(self._figure, self.updateAnimation, init_func=self.initAnimation, frames=100, interval=100, blit=True, repeat=True)
+        self.anim = animation.FuncAnimation(self._figure,
+                                            self.updateAnimation,
+                                            init_func=self.initAnimation,
+                                            frames=100,
+                                            interval=100,
+                                            blit=True,
+                                            repeat=True)
         pyplot.show()
 
     def __del__(self):

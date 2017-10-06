@@ -7,7 +7,7 @@
       <x>20</x>
       <y>20</y>
       <w>430</w>
-      <h>340</h>
+      <h>360</h>
     </coordinates>
     <panel_attributes>Animation
 Animation.py
@@ -23,10 +23,12 @@ Animation.py
 - _redLine: pyplot.lines.Line2D
 - _figure: pyplot.figure
 - anim: pyplot.animation
+- _axLimit: int
 --
 - __init__(queue animData1, queue animData2, pyqtSignal signal)
 - run()
 - plot()
+- plot2()
 - initAnimation()
 - updateAnimation(iterable i)
 - animate()

@@ -11,7 +11,7 @@
     </coordinates>
     <panel_attributes>Communicate
 PyQt5.QtCore.QObject
-mainwindow.py
+MainWindow.py
 --
 - measurementProgress: pyqtSignal
 - startMeasurement: pyqtSignal
