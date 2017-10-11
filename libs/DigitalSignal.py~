@@ -10,22 +10,24 @@
 # License: GPL3
 #####################################################################'''
 from PyDAQmx import *
-import libs.UIsettings
-import libs.AnalogSignal
+# import libs.UIsettings
+# import libs.AnalogSignal
 
 
 class DigitalSignal:
     """
-    The Illumination class serves the purpose to create the laser alternation pattern as a digital signal,
-    which can then be used to control the AOTF. Also the digital silencer pulse for the APDs is generated here.
-    It should go directly to the APD, which can take in a digital signal. All counter tasks can be configured
-    to start on a ArmStartTrigger, so the synchronization is optimal. The signal will be output on the ctrNout
-    pins.
+    The Illumination class serves the purpose to create the laser alternation
+    pattern as a digital signal, which can then be used to control the AOTF.
+    Also the digital silencer pulse for the APDs is generated here. It should
+    go directly to the APD, which can take in a digital signal. All counter tasks
+    can be configured to start on a ArmStartTrigger, so the synchronization is optimal.
+    The signal will be output on the ctrNout pins.
     """
     def __init__(self, semaphore):
         self._sem = semaphore
-        self._dict = libs.UIsettings.UIsettings()
-        self._analog = libs.AnalogSignal.AnalogSignal()
+        # self._dict = libs.UIsettings.UIsettings()
+        self._dict = dict()
+        # self._analog = libs.AnalogSignal.AnalogSignal()
         self._percentHighGreen = 0
         self._percentHighRed = 0
         self._frequency = 0
@@ -46,38 +48,41 @@ class DigitalSignal:
         refreshes settings of this class and of the SignalIntensity class.
         @param dictionary: dict
         """
-        self._dict._a.update(dictionary)
-        self._analog.refreshSettings(self._dict._a)
+        self._dict.update(dictionary)
+        # self._analog.refreshSettings(self._dict._a)
 
     def calcSignal(self):
         """
-        The signal is generated on the base of daqmx COPulseChanTime task, which suits the need of interleaved
-        signal perfectly. A high and a low Time can be configured, so an initial delay can, which make the alternation
-        possible. All values are in seconds (As far as nidaqmx documentation states, there's no smaller possibility).
-        The digital signal does not take into account at which power percentage the lasers should be operated.
-        The height of the signal is 5V(TTL). The silencer runs at doubled frequency, so the APDs get muted on all
-        transitions from laser to laser.
+        The signal is generated on the base of daqmx COPulseChanTime task, which
+        suits the need of interleaved signal perfectly. A high and a low Time can
+        be configured, so an initial delay can, which make the alternation possible.
+        All values are in seconds (As far as nidaqmx documentation states, there's
+        no smaller possibility). The digital signal does not take into account at
+        which power percentage the lasers should be operated. The height of the signal
+        is 5V(TTL). The silencer runs at doubled frequency, so the APDs get muted on
+        all transitions from laser to laser.
         """
-        self._percentHighGreen = (self._dict._a["laser percentageG"] / 100.0)
-        self._percentHighRed = (self._dict._a["laser percentageR"] / 100.0)
-        self._frequency = self._dict._a["laser frequency"]
+        self._percentHighGreen = (self._dict["laser percentageG"] / 100.0)
+        self._percentHighRed = (self._dict["laser percentageR"] / 100.0)
+        self._frequency = self._dict["laser frequency"]
         self._highTime = (1.0 / self._frequency) * self._percentHighGreen
         self._lowTime = (1.0 / self._frequency) * self._percentHighRed
         self._initialDelay_red = self._highTime
-        self._lowSil = (0.05 / 100000)    # The silencer takes 10% off the illumination/detection time at 100kHz (50/50), at 1kHz 0.001%
+        self._lowSil = (0.05 / 100000)      # The silencer takes 10% off the illumination/detection time
+                                            # at 100kHz (50/50), at 1kHz 0.001%
         self._highSil = (1.0 / self._frequency) - (self._lowSil)
         self._initialDelay_sil1 = (0.4 * self._lowSil)
         self._initialDelay_sil2 = self._initialDelay_sil1 + self._highTime
 
     def InitIllumination(self):
         """
-        The counter output tasks are configured as PulseChanTime, which is fairly flexible.
-        The tasks are triggered by an ArmStartTrigger, which makes it wait for the next trigger
-        edge. Also the analog signal gets started here. The semaphore indicates, that initiation
-        is done.
+        The counter output tasks are configured as PulseChanTime, which is fairly
+        flexible. The tasks are triggered by an ArmStartTrigger, which makes it wait
+        for the next trigger edge. Also the analog signal gets started here. The
+        semaphore indicates, that initiation is done.
         """
         self.calcSignal()
-        self._analog.InitAnalog()
+        # self._analog.InitAnalog()
 
         self._green = Task()
         self._green.CreateCOPulseChanTime(counter="Dev2/ctr4",
@@ -127,7 +132,7 @@ class DigitalSignal:
         Inits the digital tasks, start analogue signal and after that starts digital tasks.
         """
         self.InitIllumination()
-        self._analog.startAnalog()
+        # self._analog.startAnalog()
 
         self._green.StartTask()
         self._red.StartTask()
@@ -163,4 +168,4 @@ class DigitalSignal:
         self._sil.ClearTask()
         self._sil2.ClearTask()
 
-        self._analog.stopAnalog()
+        # self._analog.stopAnalog()

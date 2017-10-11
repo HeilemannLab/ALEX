@@ -13,6 +13,7 @@ import libs.DigitalSignal
 import libs.Timing
 import libs.AnalogSignal
 from multiprocessing import Process
+import time
 
 
 class Laser(Process):
@@ -57,6 +58,7 @@ class Laser(Process):
             pass
         self._analog.stopAnalog()
         self._digital.stopIllumination()
+        time.sleep(0.2)
         self._timing.stopClock()
         print("Laser stopped and exits.")
 

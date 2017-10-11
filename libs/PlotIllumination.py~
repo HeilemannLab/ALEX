@@ -11,6 +11,8 @@
 #####################################################################'''
 import numpy as np
 from matplotlib import pyplot as plt
+import libs.UIsettings
+# from matplotlib.backends.backend_pdf import PdfPages
 
 
 class PlotIllumination:
@@ -20,7 +22,7 @@ class PlotIllumination:
     saved.
     """
     def __init__(self):
-        self._dict = dict()
+        self._dict = libs.UIsettings.UIsettings()
         self._t = np.arange(0, 101, 1)
         self._green = np.zeros([101])
         self._red = np.zeros([101])
@@ -38,9 +40,9 @@ class PlotIllumination:
         'savefig' may not support .pdf file format.
         @param filename: str
         """
-        self._greenPercent = self._dict["laser percentageG"]
-        self._greenAmp = self._dict["lpower green"]
-        self._redAmp = self._dict["lpower red"]
+        self._greenPercent = self._dict._a["laser percentageG"]
+        self._greenAmp = self._dict._a["lpower green"]
+        self._redAmp = self._dict._a["lpower red"]
 
         self._green[1:self._greenPercent + 1] = self._greenAmp
         self._red[self._greenPercent + 1:-1] = self._redAmp

@@ -10,8 +10,6 @@
 # License: GPL3
 #####################################################################'''
 from PyDAQmx import *
-import libs.UIsettings
-import libs.AnalogSignal
 
 
 class DigitalSignal:
@@ -25,8 +23,7 @@ class DigitalSignal:
     """
     def __init__(self, semaphore):
         self._sem = semaphore
-        self._dict = libs.UIsettings.UIsettings()
-        self._analog = libs.AnalogSignal.AnalogSignal()
+        self._dict = dict()
         self._percentHighGreen = 0
         self._percentHighRed = 0
         self._frequency = 0
@@ -47,8 +44,7 @@ class DigitalSignal:
         refreshes settings of this class and of the SignalIntensity class.
         @param dictionary: dict
         """
-        self._dict._a.update(dictionary)
-        self._analog.refreshSettings(self._dict._a)
+        self._dict.update(dictionary)
 
     def calcSignal(self):
         """
@@ -61,9 +57,9 @@ class DigitalSignal:
         is 5V(TTL). The silencer runs at doubled frequency, so the APDs get muted on
         all transitions from laser to laser.
         """
-        self._percentHighGreen = (self._dict._a["laser percentageG"] / 100.0)
-        self._percentHighRed = (self._dict._a["laser percentageR"] / 100.0)
-        self._frequency = self._dict._a["laser frequency"]
+        self._percentHighGreen = (self._dict["laser percentageG"] / 100.0)
+        self._percentHighRed = (self._dict["laser percentageR"] / 100.0)
+        self._frequency = self._dict["laser frequency"]
         self._highTime = (1.0 / self._frequency) * self._percentHighGreen
         self._lowTime = (1.0 / self._frequency) * self._percentHighRed
         self._initialDelay_red = self._highTime
@@ -81,7 +77,6 @@ class DigitalSignal:
         semaphore indicates, that initiation is done.
         """
         self.calcSignal()
-        self._analog.InitAnalog()
 
         self._green = Task()
         self._green.CreateCOPulseChanTime(counter="Dev2/ctr4",
@@ -131,7 +126,6 @@ class DigitalSignal:
         Inits the digital tasks, start analogue signal and after that starts digital tasks.
         """
         self.InitIllumination()
-        self._analog.startAnalog()
 
         self._green.StartTask()
         self._red.StartTask()
@@ -166,5 +160,3 @@ class DigitalSignal:
         self._red.ClearTask()
         self._sil.ClearTask()
         self._sil2.ClearTask()
-
-        self._analog.stopAnalog()

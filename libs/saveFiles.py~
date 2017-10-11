@@ -76,7 +76,7 @@ class SaveFiles:
         # 'alex_excitation_period1' and 'alex_excitation_period2'. Those must be given
         # in unit of timestamps, say 10ns.
         self.refreshSettings(settings)
-        whole_period = np.floor((self._dict._a["frequency"]) / (1e-08))
+        whole_period = np.floor((self._dict._a["laser frequency"]) / (1e-08))
         period1 = np.floor(whole_period * (self._dict._a["laser percentageG"]))
 
         self._hdf_dict = self._mask.maskWindow(self._hdf_dict)
@@ -114,10 +114,11 @@ class SaveFiles:
         path = pathlib.Path(path)
 
         # open to append rest oft required dict and convert to photon-hdf5
-        self._hdf_dict = dict()
-        dictionary = self.loadSetsDict(path / 'HDF_additional_info.p')
+        # dictionary = self.loadSetsDict(path / 'HDF_additional_info.p')
+        self._hdf_dict = self.loadSetsDict(path / 'HDF_additional_info.p')
         print("\ndictionary: ", dictionary)
-        self._hdf_dict = self._mask.maskWindow(dictionary)
+        # self._hdf_dict = self._mask.maskWindow(dictionary)
+        self._hdf_dict = self._mask.maskWindow(self._hdf_dict)
         print("\nhdf_dict: ", self._hdf_dict)
 
         # Rollover correction

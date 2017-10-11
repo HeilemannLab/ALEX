@@ -114,10 +114,11 @@ class SaveFiles:
         path = pathlib.Path(path)
 
         # open to append rest oft required dict and convert to photon-hdf5
-        self._hdf_dict = dict()
-        dictionary = self.loadSetsDict(path / 'HDF_additional_info.p')
-        print("\ndictionary: ", dictionary)
-        self._hdf_dict = self._mask.maskWindow(dictionary)
+        # dictionary = self.loadSetsDict(path / 'HDF_additional_info.p')
+        self._hdf_dict = self.loadSetsDict(path / 'HDF_additional_info.p')
+        print("\ndictionary: ", self._hdf_dict)
+        # self._hdf_dict = self._mask.maskWindow(dictionary)
+        self._hdf_dict = self._mask.maskWindow(self._hdf_dict)
         print("\nhdf_dict: ", self._hdf_dict)
 
         # Rollover correction

@@ -12,7 +12,6 @@
 import numpy as np
 import time
 from PyDAQmx import *
-import libs.UIsettings
 
 
 class AnalogSignal:
@@ -26,8 +25,7 @@ class AnalogSignal:
     """
     def __init__(self):
         self._sampPoints = 2
-        self._dict = libs.UIsettings.UIsettings()
-        self._freq = self._dict._a["laser frequency"]
+        self._dict = dict()
         self._red = np.zeros([2])
         self._green = np.zeros([2])
         self._read = int32()
@@ -37,7 +35,8 @@ class AnalogSignal:
         self._analog_output = None
 
     def refreshSettings(self, dictionary):
-        self._dict._a.update(dictionary)
+        self._dict.update(dictionary)
+        self._freq = self._dict["laser frequency"]
 
     def Intensities(self):
         """
@@ -48,8 +47,8 @@ class AnalogSignal:
         the arrays must be concatenated. The data gets written
         to the channels in the order as they are stacked respectively.
         """
-        self._redAmp = self._dict._a["lpower red"]
-        self._greenAmp = self._dict._a["lpower green"]
+        self._redAmp = self._dict["lpower red"]
+        self._greenAmp = self._dict["lpower green"]
 
         self._red[:] = (self._redAmp * 5.0 / 100.0)
         self._green[:] = (self._greenAmp * 5.0 / 100.0)
