@@ -29,7 +29,7 @@ class SaveFiles:
     corresponding detector mask.
     """
     def __init__(self):
-        self._hdf_dict = None
+        self._hdf_dict = dict()
         self._dict = libs.UIsettings.UIsettings()
         self._plot = libs.PlotIllumination.PlotIllumination()
         self._mask = libs.HDFmask.HDFmask()
@@ -71,12 +71,12 @@ class SaveFiles:
         """
         # Start whith assembling the hdf info, import here will be the sample name,
         # as it is used for the folder where all files get saved into. Also data
-        # between the dicts get shared: Important ist the ALEX period in its whole
+        # between the dicts get shared: Important is the ALEX period in its whole
         # and the illumination percentages. In fretbursts they are called 'alex period',
         # 'alex_excitation_period1' and 'alex_excitation_period2'. Those must be given
         # in unit of timestamps, say 10ns.
         self.refreshSettings(settings)
-        whole_period = np.floor((self._dict._a["laser frequency"]) / (1e-08))
+        whole_period = np.floor(1 / (self._dict._a["laser frequency"] * 1e-08))
         period1 = np.floor(whole_period * (self._dict._a["laser percentageG"]))
 
         self._hdf_dict = self._mask.maskWindow(self._hdf_dict)
@@ -101,7 +101,7 @@ class SaveFiles:
         # self._plot.plot(str(folder) + '/Illumination_scheme.png')
         return folder    # folder must be returned to give it to the dataprocessers
 
-    def convertToPhotonHDF5(self, path):
+    def convertToPhotonHDF5(self, path, signal):
         """
         This function does the converting from simple hdf5 files in one nice
         photon-hdf5 file fit for usage with Fretbursts. First the arrays get corrected
@@ -114,12 +114,10 @@ class SaveFiles:
         path = pathlib.Path(path)
 
         # open to append rest oft required dict and convert to photon-hdf5
-        # dictionary = self.loadSetsDict(path / 'HDF_additional_info.p')
-        self._hdf_dict = self.loadSetsDict(path / 'HDF_additional_info.p')
-        print("\ndictionary: ", dictionary)
-        # self._hdf_dict = self._mask.maskWindow(dictionary)
+        dictionary = self.loadSetsDict(path / 'HDF_additional_info.p')
+        self._hdf_dict.update(dictionary)
+        print(self._hdf_dict)
         self._hdf_dict = self._mask.maskWindow(self._hdf_dict)
-        print("\nhdf_dict: ", self._hdf_dict)
 
         # Rollover correction
         self.correctRollover(path, 1)
@@ -150,6 +148,7 @@ class SaveFiles:
         self._saveHDF.assembleDictionary(self._hdf_dict)
         self._saveHDF.saveAsHDF(str(path / 'smALEX.hdf'))
         print("Data stored in photon-hdf5.")
+        signal.emit()
 
     def merge_timestamps(self, t1, t2):
         """
@@ -210,7 +209,7 @@ class SaveFiles:
         and returns it.
         @param path: string
         """
-        dictionary = None
+        dictionary = dict()
         path = pathlib.Path(path)
         if path.is_file():
             with path.open("rb") as f:

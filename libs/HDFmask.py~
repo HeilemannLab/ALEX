@@ -22,6 +22,16 @@ class HDFmask(QDialog):
     def __init__(self):
         super(HDFmask, self).__init__()
         self._dict = dict()
+        """
+        self._dict = {"author_affiliation": "Institute for Physical and Theoretical Chemistry, Goethe University Frankfurt",
+                          "author": "Your name",
+                          "sample_name": "Sample",
+                          "buffer_name": "Buffer",
+                          "dye_names": "Dye names, seperated by comma",
+                          "description": "Detailed description",
+                          "num_dyes": int(2)}
+        self.initWindow()
+        """
 
     def initWindow(self):
         label1 = QLabel("Author")
@@ -33,22 +43,25 @@ class HDFmask(QDialog):
         label8 = QLabel("Number of dyes")
 
         line1 = QLineEdit()
-        line1.setPlaceholderText(self._dict["author"])
+        line1.setText(self._dict["author"])
         line2 = QLineEdit()
-        line2.setPlaceholderText(self._dict["author_affiliation"])
+        line2.setText(self._dict["author_affiliation"])
         line3 = QLineEdit()
         line3.setToolTip("Combined with the date and time, the sample"
                          " name will be the folder where you can find all"
                          " data. Please dont use '/', '%', '&' or spaces.")
-        line3.setPlaceholderText(self._dict["sample_name"])
+        print(self._dict["sample_name"])
+        line3.setText(self._dict["sample_name"])
+        print(line3.text())
         line4 = QLineEdit()
-        line4.setPlaceholderText(self._dict["buffer_name"])
+        line4.setText(self._dict["buffer_name"])
         line5 = QLineEdit()
-        line5.setPlaceholderText(self._dict["dye_names"])
+        line5.setText(self._dict["dye_names"])
         line6 = QLineEdit()
-        line6.setPlaceholderText(self._dict["description"])
+        line6.setText(self._dict["description"])
         line8 = QLineEdit()
-        line8.setPlaceholderText(str(self._dict["num_dyes"]))
+        line8.setToolTip("Please type in integers! '1', '2' or '10', but never 'one' or 'three'!")
+        line8.setText(str(self._dict["num_dyes"]))
 
         line1.textChanged.connect(lambda: self.setitem("author", line1.text()))
         line2.textChanged.connect(lambda: self.setitem("author_affiliation", line2.text()))
@@ -82,8 +95,8 @@ class HDFmask(QDialog):
         self.setWindowTitle("Additional measurement informations")
 
     def maskWindow(self, dictionary):
-        if dictionary is None:
-            self._dict = {"author_affiliation": "Institute for Physical and Theoretical Chemistry, Goethe-University Frankfurt",
+        if not dictionary:
+            self._dict = {"author_affiliation": "Institute for Physical and Theoretical Chemistry, Goethe University Frankfurt",
                           "author": "Your name",
                           "sample_name": "Sample",
                           "buffer_name": "Buffer",
@@ -92,7 +105,7 @@ class HDFmask(QDialog):
                           "num_dyes": int(2)}
         else:
             self._dict.update(dictionary)
-        print("dict: ", self._dict)
+            print(self._dict)
         self.initWindow()
         self.exec_()
         return self._dict

@@ -35,7 +35,7 @@ class DataProcesser(Process):
         self.daemon = True
         self._dataQ = dataQ
         self._readArraySize = readArraySize
-        self._animDataQ = animDataQ
+        # self._animDataQ = animDataQ
         self._N = N
         self._folder = folder
         self._timestamps = np.zeros([1, 2], dtype=int)
@@ -47,7 +47,7 @@ class DataProcesser(Process):
         so data must not be saved. If there's a folder, data gets
         saved there.
         """
-        if (self._folder == 'Cont') or (self._folder == None):
+        if (self._folder == 'Cont') or (self._folder is None):
             self.dataProcessing_cont()
         else:
             self.dataProcessing_finite()

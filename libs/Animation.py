@@ -40,7 +40,7 @@ class Animation:
         self._redLine = 0
         self._figure = pyplot.figure()
         self.anim = 0
-        self._axLimit = 1e8
+        self._axLimit = 1e6
 
     def run(self):
         """
@@ -133,19 +133,24 @@ class Animation:
         # The print error statement in except can be neglected in real mesurements.
         try:
             green = float(1e8) * self._animDataQ1.get(timeout=1.0)
-            red = float(1e8) * (-1) * self._animDataQ2.get(timeout=1.0)
-            x = [int(green), int(-1 * red)]
-            self._signal.displayRates.emit(x)
-            if (green >= 15000000) or ((-1 * red) >= 15000000):
+            if (green >= 15000000):
                 self._signal.warning.emit()
-
-            self._greenData.append(green)
-            self._redData.append(red)
-            self._tdata.append(self._tdata[-1] + self._dt)
         except:
-            print("error getting data for animation")
-            pass
+            green = 0
+            # print("error getting data for animation")
+            # pass
+        try:
+            red = float(1e8) * (-1) * self._animDataQ2.get(timeout=1.0)
+            if ((-1 * red) >= 15000000):
+                self._signal.warning.emit()
+        except:
+            red = 0
+        self._greenData.append(green)
+        self._redData.append(red)
+        x = [int(green), int(-1 * red)]
+        self._signal.displayRates.emit(x)
 
+        self._tdata.append(self._tdata[-1] + self._dt)
         self._greenLine.set_data(self._tdata, self._greenData)
         self._redLine.set_data(self._tdata, self._redData)
         return self._greenLine, self._redLine,
