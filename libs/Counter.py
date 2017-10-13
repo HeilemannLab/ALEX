@@ -60,6 +60,7 @@ class Counter(Process):
             self._dataQ.put(self._data)
         self._apd.stopCounting()
         self._dataQ.put('STOP')
+        self._sem.release()
 
     def __del__(self):
         print("Counter class instance %i has been removed." % (self._N))

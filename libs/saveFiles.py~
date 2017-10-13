@@ -119,6 +119,9 @@ class SaveFiles:
         print(self._hdf_dict)
         self._hdf_dict = self._mask.maskWindow(self._hdf_dict)
 
+        del self._mask
+        self._mask = libs.HDFmask.HDFmask()
+
         # Rollover correction
         self.correctRollover(path, 1)
         self.correctRollover(path, 2)

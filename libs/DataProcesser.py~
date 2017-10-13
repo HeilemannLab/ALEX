@@ -35,7 +35,7 @@ class DataProcesser(Process):
         self.daemon = True
         self._dataQ = dataQ
         self._readArraySize = readArraySize
-        # self._animDataQ = animDataQ
+        self._animDataQ = animDataQ
         self._N = N
         self._folder = folder
         self._timestamps = np.zeros([1, 2], dtype=int)
@@ -51,6 +51,7 @@ class DataProcesser(Process):
             self.dataProcessing_cont()
         else:
             self.dataProcessing_finite()
+        self._animDataQ.close()
 
     def dataProcessing_cont(self):
         """

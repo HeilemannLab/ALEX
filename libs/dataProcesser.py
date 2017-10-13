@@ -51,6 +51,7 @@ class DataProcesser(Process):
             self.dataProcessing_cont()
         else:
             self.dataProcessing_finite()
+        self._animDataQ.close()
 
     def dataProcessing_cont(self):
         """

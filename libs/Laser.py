@@ -58,6 +58,7 @@ class Laser(Process):
         self._analog.stopAnalog()
         self._digital.stopIllumination()
         self._timing.stopClock()
+        self._sem.release()
         print("Laser stopped and exits.")
 
     def __del__(self):
