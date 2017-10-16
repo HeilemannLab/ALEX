@@ -14,10 +14,10 @@ import sys
 from PyQt5.QtWidgets import QApplication
 from multiprocessing import freeze_support
 
-import mainwindow as mw
+import MainWindow as mw
 
 
-def main():
+def Main():
     """Main class launches Mainwindow, freeze_support helps with maintaining multiprocessing"""
 
     app = QApplication(sys.argv)
@@ -27,4 +27,4 @@ def main():
 
 if __name__ == '__main__':
     freeze_support()
-    main()
+    Main()

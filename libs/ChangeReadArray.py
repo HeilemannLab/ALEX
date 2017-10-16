@@ -58,4 +58,4 @@ class ChangeReadArray(QDialog):
 
     def showDialog(self):
         self.exec_()
-        return self.result
+        return int(self.result)

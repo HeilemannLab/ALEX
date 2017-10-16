@@ -1,1 +1,0 @@
-C:\Users\Karoline2\AppData\Local\Programs\Python\Python35\python.exe fb_main.py

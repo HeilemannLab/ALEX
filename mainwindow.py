@@ -11,12 +11,10 @@
 ########################################################################'''
 import sys
 import time
-import os
 import numpy as np
 
 from threading import Thread
 from matplotlib import pyplot as plt
-from multiprocessing import freeze_support
 from multiprocessing import Event as mpEvent
 from multiprocessing import Queue as mpQueue
 from multiprocessing import Semaphore
@@ -26,13 +24,14 @@ from PyQt5.QtWidgets import (QGroupBox, QMessageBox, QMainWindow, QVBoxLayout, Q
                              QRadioButton, QProgressBar, QLabel, QGridLayout, QLCDNumber, QLineEdit)
 from PyQt5.QtCore import Qt, pyqtSignal, QObject, pyqtSlot
 
-import libs.dictionary
-import libs.Refresher
+import libs.UIsettings
+import libs.Refresh
 import libs.Animation
 import libs.Counter
 import libs.Laser
-import libs.dataProcesser
-import libs.saveFiles
+import libs.DataProcesser
+import libs.SaveFiles
+import libs.ChangeReadArray
 
 
 class Communicate(QObject):
@@ -55,6 +54,7 @@ class Communicate(QObject):
     stopMeasurement = pyqtSignal()
     warning = pyqtSignal()
     displayRates = pyqtSignal(list)
+    convertDone = pyqtSignal()
 
 
 class MainWindow(QMainWindow):
@@ -78,11 +78,14 @@ class MainWindow(QMainWindow):
         possibility, due to their separation from the main loop. libs.Animation also gets instanciated
         later, due to the window launching functionality in its init method.
         """
-        self._dict = libs.dictionary.UIsettings()
-        self._files = libs.saveFiles.SaveFiles()
-        self._mode = self._dict.getitem("Radio")
-        self._r = libs.Refresher.Refresh()
-        self._readArraySize = int(1e6)    # 1e7 is ok, no more, 1e6 works better (with 1MHz sampling) leads to 1array/sec writing rate
+        self._dict = libs.UIsettings.UIsettings()
+        self._files = libs.SaveFiles.SaveFiles()
+        self._changeRA = libs.ChangeReadArray.ChangeReadArray()
+        self._r = libs.Refresh.Refresh()
+        self._readArraySize = int(1e3)      # 1e7 is ok, no more, 1e6 works better (with 1MHz sampling)
+                                            # leads to 1array/sec writing rate. Since average sampling
+                                            # rate of a real sample may be smaller than 1MHz, array size
+                                            # also could be smaller (Test it!).
 
         # Queues, Semaphores and Events all derived from the multiprocessing library
         self._dataQ1 = mpQueue()
@@ -98,12 +101,14 @@ class MainWindow(QMainWindow):
         self.signal.measurementProgress.connect(lambda x: self.setProgressBar(x))
         self.signal.warning.connect(self.warnPopUp)
         self.signal.displayRates.connect(lambda x: self.displayRatesOnLCD(x))
+        self.signal.convertDone.connect(lambda: self.statusBar.showMessage('Conversion done!'))
 
         # ################## #
         # Window and widgets #
         # ################## #
 
         self.setGeometry(500, 300, 500, 200)    # x, y, width, height
+        self.setWindowTitle('ALEX')
 
         # ## Statusbar
         self.statusBar = QStatusBar()
@@ -116,23 +121,21 @@ class MainWindow(QMainWindow):
         self.loadApp.setShortcut('Ctrl+l')
         self.loadApp.triggered.connect(self.loadDict)
 
-        # save app, saves measurement settings to file, folder is specified by the last load operation
+        # save app, saves measurement settings to file
         self.saveApp = QAction('Save settings', self)
         self.saveApp.setShortcut('Ctrl+s')
-        # self.saveApp.triggered.connect(lambda: self.GetFileName('Save'))
-        self.saveApp.triggered.connect(lambda: self._files.saveSetsDict(self._dict._a, self.getDirectory(), 'Measurement_settings'))
+        self.saveApp.triggered.connect(lambda: self._files.saveSetsDict(self._dict._a, self.getDirectory(),
+                                                                        'Measurement_settings'))
 
         # convert data to photon-hdf5
         self.convertData = QAction('Convert raw data to photon-hdf5', self)
-        # self.convertData.triggered.connect(lambda: self.GetFileName('Convert'))
-        self.convertData.triggered.connect(self._files.ConvertToPhotonHDF5)     # This is still not ready!!
-                                                                                # A file dialog could hint the method
-                                                                                # to the right folder, where it
-                                                                                # searches for the temp files on its own
+        self.convertData.setShortcut('Ctrl+c')
+        self.convertData.triggered.connect(lambda: self._files.convertToPhotonHDF5(self.getDirectory(), self.signal.convertDone))
 
-        # save Data to .hdf5 file in a manner that it can be processed by the FretBursts library
-        self.saveDataHDF = QAction('This widget is free', self)
-        self.saveDataHDF.triggered.connect(lambda: self.GetFileName('free'))
+        # change ReadArray size
+        self.setArraySize = QAction('Read arrays size', self)
+        self.setArraySize.setShortcut('Ctrl+a')
+        self.setArraySize.triggered.connect(self.changeArraySize)
 
         # close the app
         self.closeApp = QAction('Close', self)
@@ -151,6 +154,7 @@ class MainWindow(QMainWindow):
         filesGroup.setLayout(hbox12)
 
         self._location = QLineEdit()
+        self._location.setToolTip("Please select a directory. If you do not, the data will not be saved!")
         self._location.setMaxLength(50)
         self._location.setReadOnly(True)
         hbox12.addWidget(self._location)
@@ -163,9 +167,9 @@ class MainWindow(QMainWindow):
         # ## label for different widgets
         self.label1 = QLabel("Laserpower green")
         self.label2 = QLabel("Laserpower red")
-        self.label3 = QLabel("Ratio of illumination green/red")
-        self.label4 = QLabel("Laser alternation \nfrequency [Hz]")
-        self.label5 = QLabel("Measurement duration [s]")
+        self.label3 = QLabel("Ratio of illumination\ngreen/red")
+        self.label4 = QLabel("ALEX\nfrequency [Hz]")
+        self.label5 = QLabel("Measurement\nduration [s]")
         self.label6 = QLabel("Measurement mode")
         self.label7 = QLabel("Counts in green channel")
         self.label8 = QLabel("Counts in red channel")
@@ -414,7 +418,7 @@ class MainWindow(QMainWindow):
         fileMenue.addAction(self.loadApp)
         fileMenue.addAction(self.saveApp)
         fileMenue.addAction(self.convertData)
-        fileMenue.addAction(self.saveDataHDF)
+        fileMenue.addAction(self.setArraySize)
         fileMenue.addAction(self.closeApp)
 
     def getFilename(self):
@@ -505,7 +509,6 @@ class MainWindow(QMainWindow):
             self._running.set()
             try:
                 plt.close(1)
-                os.remove("tempAPD1.hdf", "tempAPD2.hdf")
             except:
                 pass
             self.startProcesses()
@@ -520,31 +523,34 @@ class MainWindow(QMainWindow):
         Measurements settings and hdf info get saved into that new folder as .p and
         .txt files.
         """
-        # Hdf information, also the sample name here is important!
-        new_folder = None
-        if self._location.text():
-            new_folder = self._files.saveRawData(self._location.text(), self._dict._a)
+        if self._dict._a["Radio"] == 0:
+            new_folder = 'Cont'
+            self.statusBar.showMessage("You are measuring in 'continuous' mode. The data will not get saved!")
+        elif self._dict._a["Radio"] == 1:
+            if self._location.text():
+                new_folder = self._files.saveRawData(self._location.text(), self._dict._a)
+                print("New folder: ", new_folder)
+            else:
+                self.statusBar.showMessage('Please select a file directory!')
+                new_folder = None
         else:
-            self.statusBar.showMessage('Please select a file directory!')
+            print("Somethings happening here...")
         return new_folder
 
     def startProcesses(self):
         """Get folder and start all processes and threads."""
         new_folder = self.finalLocation()
-        if new_folder is None:
-            self._running.clear()
-            return
 
         # Initialize processes and waiter thread
         self._counter1 = libs.Counter.Counter(self._running, self._dataQ1, self._readArraySize,
                                               self._semaphore, 1)
         self._counter2 = libs.Counter.Counter(self._running, self._dataQ2, self._readArraySize,
                                               self._semaphore, 2)
-        self._laser = libs.Laser.LaserControl(self._running, self._dict, self._semaphore)
+        self._laser = libs.Laser.Laser(self._running, self._dict._a, self._semaphore)
         self._anim = libs.Animation.Animation(self._animDataQ1, self._animDataQ2, self.signal)
-        self._dataProcesser1 = libs.dataProcesser.DataProcesser(self._dataQ1, self._animDataQ1,
+        self._dataProcesser1 = libs.DataProcesser.DataProcesser(self._dataQ1, self._animDataQ1,
                                                                 self._readArraySize, 1, new_folder)
-        self._dataProcesser2 = libs.dataProcesser.DataProcesser(self._dataQ2, self._animDataQ2,
+        self._dataProcesser2 = libs.DataProcesser.DataProcesser(self._dataQ2, self._animDataQ2,
                                                                 self._readArraySize, 2, new_folder)
         self.statusBar.showMessage("Started!")
         self._anim.run()
@@ -573,8 +579,7 @@ class MainWindow(QMainWindow):
         """
         while self._semaphore.get_value() > 0:
             pass
-        self._mode = self._dict._a["Radio"]
-        if self._mode == 0:
+        if self._dict._a["Radio"] == 0:
             self.progress.setRange(0, 0)
         else:
             duration = self._dict._a["Duration"]
@@ -613,44 +618,64 @@ class MainWindow(QMainWindow):
         msg.setWindowTitle("APD Warning")
         msg.exec()
 
+    def changeArraySize(self):
+        answer = self._changeRA.showDialog()
+        if answer is None:
+            pass
+        else:
+            self._readArraySize = answer
+            msg = 'The read array size is now {}'.format(self._readArraySize)
+            self.statusBar.showMessage(msg)
+        print(answer, self._readArraySize)
+
     @pyqtSlot()
     def stopBtn(self):
         """Try to stop animation and join all the processes/threads. Extensive checking can be shortened."""
         if self._running.is_set():
             self._running.clear()
             self._anim.anim._stop()
+
             self.progress.setRange(0, 1)
             while not self._semaphore.get_value() == 3:
-                self._semaphore.release()
+                pass
+
             # joining
             self.statusBar.showMessage("Stopped! Please wait while data is processed.")
             self._laser.join(timeout=3.0)
             self._u.join(timeout=3.0)
             self._counter1.join(timeout=10.0)
             self._counter2.join(timeout=10.0)
-            self._dataProcesser1.join(10.0)
-            self._dataProcesser2.join(10.0)
+            self._dataProcesser2.join(timeout=10.0)
+            self._dataProcesser1.join(timeout=10.0)
+
             # extensive checking for joining
             if self._dataProcesser1.is_alive():
-                print("Processer 1 did not join.")
+                print("DataProcesser 1 did not join.")
                 del self._dataProcesser1
-            elif self._dataProcesser2.is_alive():
-                print("Processer 2 did not join.")
+            if self._dataProcesser2.is_alive():
+                print("DataProcesser 2 did not join.")
                 del self._dataProcesser2
-            elif self._counter1.is_alive():
+            if self._counter1.is_alive():
                 print("Counter 1 did not join.")
                 del self._counter1
-            elif self._counter2.is_alive():
+            if self._counter2.is_alive():
                 print("Counter 2 did not join.")
                 del self._counter2
-            elif self._u.is_alive():
+            if self._u.is_alive():
                 print("Waiter thread did not join.")
                 del self._u
-            elif self._laser.is_alive():
+            if self._laser.is_alive():
                 print("Laser did not join.")
                 del self._laser
             else:
                 print("All workers have joined.")
+
+            # Unfortunately there is no other way than deleting the queues
+            # If not done so, the rest data will be shown in the next measurement
+            # instead of the new data.
+            del self._animDataQ1, self._animDataQ2
+            self._animDataQ1 = mpQueue()
+            self._animDataQ2 = mpQueue()
             self.statusBar.showMessage("Stopped and idle!")
         else:
             print("not running at all!")

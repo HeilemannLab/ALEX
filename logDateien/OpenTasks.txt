@@ -1,7 +1,0 @@
-+ save parameters in .pickle and .txt
-+ save plot in .txt and .pdf
-+ save data in .txt and .hdf5
-+ fretbursts
-+ accelerate program
-+ write 1 page paper, motivation
-+ write umlets

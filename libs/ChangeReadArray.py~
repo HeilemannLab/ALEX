@@ -23,7 +23,7 @@ class ChangeReadArray(QDialog):
         label = QLabel('This is a core feature of the program. '
                        'Only change it, if you are aware of the consequences.')
 
-        self.line = QLineEdit('Read array size: ')
+        self.line = QLineEdit()
         self.line.setPlaceholderText('Type in an integer')
         self.line.setValidator(QIntValidator())
         self.line.setMaxLength(6)

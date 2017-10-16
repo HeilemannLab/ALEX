@@ -1,9 +1,0 @@
-2017/04/28
-
-git version: 27.04.2017
-
-result:
-+ analogoutput doesn't give proper signal
-
-change:
-+ 
