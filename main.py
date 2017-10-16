@@ -18,7 +18,10 @@ import MainWindow as mw
 
 
 def Main():
-    """Main class launches Mainwindow, freeze_support helps with maintaining multiprocessing"""
+    """
+    Main class launches Mainwindow, freeze_support
+    helps with maintaining multiprocessing.
+    """
 
     app = QApplication(sys.argv)
     mainWindow = mw.MainWindow()

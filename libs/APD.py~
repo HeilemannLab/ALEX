@@ -16,7 +16,8 @@ import numpy as np
 
 class APD:
     """
-    This class generates the interface to the 6612 card, in detail the counter input tasks. The 6612 card should be 'Device 2'.
+    This class generates the interface to the 6612 card, in detail the counter
+    input tasks. The 6612 card should be 'Device 2'.
     """
     def __init__(self, readArraySize, N, semaphore):
         self._sampNumber = readArraySize
@@ -36,9 +37,12 @@ class APD:
 
     def startCounting(self):
         """
-        Four counters are set up, all counting edges, source terminal of counter 0 and 2 is 100MHzTimebase,
-        source terminal of 1 and 3 is their output terminal. The last function assembles all needed functions
-        and starts the tasks. This function should be called from the 'Counter.py' class.
+        Four counters are set up, all counting edges, source
+        terminal of counter 0 and 2 is 100MHzTimebase, source
+        terminal of 1 and 3 is their output terminal. The last
+        function assembles all needed functions and starts the
+        tasks. This function should be called from the 'Counter.py'
+        class.
         """
         if self._N == 1:
             self.InitializeCounter1()
@@ -54,7 +58,8 @@ class APD:
             self._sem.acquire()
             self._rollover2.StartTask()
             self._counter2.StartTask()
-        # Important note for arm start trigger: Always start trigger pulse AFTER counter tasks, else NO SYNC!
+        # Important note for arm start trigger:
+        # Always start trigger pulse AFTER counter tasks, else NO SYNC!
 
     def InitializeCounter1(self):
         """Task channels get configured"""
@@ -93,13 +98,16 @@ class APD:
 
     def SamplingCounter1(self):
         """
-        Sampling of all four counters is set to sample clock, all are sampled by the signal of their APD respectively.
-        The signal should be received by the source terminal. SetSampClkOverrunBehavior sets the task to ignore sample pulses,
-        that came faster than the task can handle. This might be the case when a fluorophore enters the volume,
-        it also means we lose all photon events that are coming in faster than 100MHz.
-        The terminal count signal of counters 0 and 2 is routed to the output terminals of counters 1 and 3 respectively.
-        Output behavior is 'puls' (not toggle). This is important because only rising edges get counted.
-        DuplicationPrevention is recommended by NI for counter tasks, where the sampling is slower that the input.
+        Sampling of all four counters is set to sample clock, all are sampled by
+        the signal of their APD respectively. The signal should be received by the
+        source terminal. SetSampClkOverrunBehavior sets the task to ignore sample
+        pulses, that came faster than the task can handle. This might be the case
+        when a fluorophore enters the volume, it also means we lose all photon events
+        that are coming in faster than 100MHz. The terminal count signal of counters 0
+        and 2 is routed to the output terminals of counters 1 and 3 respectively.
+        Output behavior is 'puls' (not toggle). This is important because only rising
+        edges get counted. DuplicationPrevention is recommended by NI for counter
+        tasks, where the sampling is slower that the input.
         """
         self._counter1.CfgSampClkTiming(sampsPerChan=self._buffer,              # This is sampsPerChanToAcquire argument
                                         source="/Dev2/PFI39",
@@ -140,8 +148,10 @@ class APD:
 
     def ArmStartCounter1(self):
         """
-        Arm start trigger makes the counters wait for an external signal. Signal could be the timing task from 6713 (over RTSI).
-        But counters should always be started first, otherwise they wait for the next edge or infinitely.
+        Arm start trigger makes the counters wait for an external signal.
+        Signal could be the timing task from 6713 (over RTSI). But counters
+        should always be started first, otherwise they wait for the next
+        edge or infinitely.
         """
         self._counter1.SetArmStartTrigType(data=DAQmx_Val_DigEdge)
         self._rollover1.SetArmStartTrigType(data=DAQmx_Val_DigEdge)
@@ -163,7 +173,10 @@ class APD:
         self._rollover2.SetDigEdgeArmStartTrigSrc(data="/Dev2/RTSI0")
 
     def readAPD(self):
-        """The data is written from the arrays into a single data array which gets returned."""
+        """
+        The data is written from the arrays into a single data array
+        which gets returned.
+        """
         if self._N == 1:
             self.actualCounting(self._rollover1, self._roll1)
             self.actualCounting(self._counter1, self._value1)
@@ -178,12 +191,21 @@ class APD:
 
     def actualCounting(self, task, readArray):
         """
-        Read the data from the cards queue into 'readArray'. Timeout is the time to wait until the last samples are written.
-        Returns the readArray
+        Read the data from the cards queue into 'readArray'.
+        Timeout is the time to wait until the last samples are
+        written. Returns the readArray.
         @param task: task name
         @param readArray: ndarray
         """
+        """
         task.ReadCounterU32(numSampsPerChan=self._sampNumber,
+                            timeout=50.0,
+                            readArray=readArray,
+                            arraySizeInSamps=self._sampNumber,    # deleted a +1, check if problem
+                            sampsPerChanRead=self._read,
+                            reserved=None)
+        """
+        task.ReadCounterF64(numSampsPerChan=self._sampNumber,
                             timeout=50.0,
                             readArray=readArray,
                             arraySizeInSamps=self._sampNumber,    # deleted a +1, check if problem

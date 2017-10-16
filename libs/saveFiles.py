@@ -59,6 +59,15 @@ class SaveFiles:
         t = t_end - t_start
         print("Rollover %i correction took %f seconds" % (N, t))
 
+    def correctRolloverInRAM(self, t1, t2):
+        t_start = time.time()
+        int_32 = (2**32) - 1
+        t1[:, 0] = t1[:, 0] + (int_32 * t1[:, 1])
+        t2[:, 0] = t2[:, 0] + (int_32 * t2[:, 1])
+        t_end = time.time()
+        t = t_end - t_start
+        print("Rollover correction took %f seconds" % t)
+
     def saveRawData(self, path, settings):
         """
         The directory gets specified by user and named by the tag. Then a special
@@ -122,28 +131,33 @@ class SaveFiles:
         self._mask = libs.HDFmask.HDFmask()
 
         # Rollover correction
-        self.correctRollover(path, 1)
-        self.correctRollover(path, 2)
+        # self.correctRollover(path, 1)
+        # self.correctRollover(path, 2)
 
         # The arrays have to be written to the RAM, because currently the merging
         # only happens in the RAM, until there's a solution writing on the hdf
         # files only.
         # array 1
         f1 = tables.open_file(str(path / 'smALEX_APD1.hdf'), 'r')
-        rows1 = f1.root.timestamps[:, 0]
+        # rows1 = f1.root.timestamps[:, 0]
+        row = f1.root.timestamps[:, :]
+        rows1 = np.array(row, dtype=np.int64)
         f1.flush()
         f1.close()
 
         # array 2
         f2 = tables.open_file(str(path / 'smALEX_APD2.hdf'), 'r')
-        rows2 = f2.root.timestamps[:, 0]
+        # rows2 = f2.root.timestamps[:, 0]
+        row = f2.root.timestamps[:, :]
+        rows2 = np.array(row, dtype=np.int64)
         f2.flush()
         f2.close()
 
         # merge the two arrays into one, create detector mask
         # and add references to 'data' and 'detector_mask' into
         # the dictionary which goes into the dictionary
-        data, detector_mask = self.merge_timestamps(rows1, rows2)
+        self.correctRolloverInRAM(rows1, rows2)
+        data, detector_mask = self.merge_timestamps(rows1[:, 0], rows2[:, 0])
         self._hdf_dict["timestamps_reference"] = data
         self._hdf_dict["detectors_reference"] = detector_mask
 
