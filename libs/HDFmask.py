@@ -50,9 +50,7 @@ class HDFmask(QDialog):
         line3.setToolTip("Combined with the date and time, the sample"
                          " name will be the folder where you can find all"
                          " data. Please dont use '/', '%', '&' or spaces.")
-        print(self._dict["sample_name"])
         line3.setText(self._dict["sample_name"])
-        print(line3.text())
         line4 = QLineEdit()
         line4.setText(self._dict["buffer_name"])
         line5 = QLineEdit()
@@ -105,7 +103,6 @@ class HDFmask(QDialog):
                           "num_dyes": int(2)}
         else:
             self._dict.update(dictionary)
-            print(self._dict)
         self.initWindow()
         self.exec_()
         return self._dict

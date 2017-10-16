@@ -82,10 +82,7 @@ class MainWindow(QMainWindow):
         self._files = libs.SaveFiles.SaveFiles()
         self._changeRA = libs.ChangeReadArray.ChangeReadArray()
         self._r = libs.Refresh.Refresh()
-        self._readArraySize = int(1e3)      # 1e7 is ok, no more, 1e6 works better (with 1MHz sampling)
-                                            # leads to 1array/sec writing rate. Since average sampling
-                                            # rate of a real sample may be smaller than 1MHz, array size
-                                            # also could be smaller (Test it!).
+        self._readArraySize = int(1e3)
 
         # Queues, Semaphores and Events all derived from the multiprocessing library
         self._dataQ1 = mpQueue()
@@ -441,7 +438,7 @@ class MainWindow(QMainWindow):
         if new_dict is not None:
             self._dict._a.update(new_dict)
             self.refreshUI(3, self._dict._a, 0)
-            self.statusBar.showMessage('Settings updatet!')
+            self.statusBar.showMessage('Settings updated!')
         else:
             self.statusBar.showMessage('No valid settings dictionary in that file!')
 
@@ -513,7 +510,6 @@ class MainWindow(QMainWindow):
                 pass
             self.startProcesses()
         else:
-            print("Already running!")
             self.statusBar.showMessage("Already running!")
 
     def finalLocation(self):
@@ -529,7 +525,6 @@ class MainWindow(QMainWindow):
         elif self._dict._a["Radio"] == 1:
             if self._location.text():
                 new_folder = self._files.saveRawData(self._location.text(), self._dict._a)
-                print("New folder: ", new_folder)
             else:
                 self.statusBar.showMessage('Please select a file directory!')
                 new_folder = None
@@ -540,6 +535,12 @@ class MainWindow(QMainWindow):
     def startProcesses(self):
         """Get folder and start all processes and threads."""
         new_folder = self.finalLocation()
+        if new_folder:
+            pass
+        else:
+            self.statusBar.showMessage('Please select a file location with the "Browse" button.')
+            self._running.clear()
+            return
 
         # Initialize processes and waiter thread
         self._counter1 = libs.Counter.Counter(self._running, self._dataQ1, self._readArraySize,
@@ -595,12 +596,19 @@ class MainWindow(QMainWindow):
 
     @pyqtSlot(int)
     def setProgressBar(self, i):
-        """Setting the progressbar, it gets called solely by a pyqtSignal from the waiter thread."""
+        """
+        Setting the progressbar, it gets called
+        solely by a pyqtSignal from the waiter thread.
+        """
         self.progress.setValue(i)
 
     @pyqtSlot(list)
     def displayRatesOnLCD(self, x):
-        """Setting the lcd numbers with the count rates, it gets called solely by a pyqtSignal from the animation class."""
+        """
+        Setting the lcd numbers with the count rates,
+        it gets called solely by a pyqtSignal from the
+        animation class.
+        """
         self.red_lcd.display(x[1])
         self.green_lcd.display(x[0])
 
@@ -630,7 +638,10 @@ class MainWindow(QMainWindow):
 
     @pyqtSlot()
     def stopBtn(self):
-        """Try to stop animation and join all the processes/threads. Extensive checking can be shortened."""
+        """
+        Try to stop animation and join all the processes/threads.
+        Extensive checking can be shortened.
+        """
         if self._running.is_set():
             self._running.clear()
             self._anim.anim._stop()
@@ -678,5 +689,4 @@ class MainWindow(QMainWindow):
             self._animDataQ2 = mpQueue()
             self.statusBar.showMessage("Stopped and idle!")
         else:
-            print("not running at all!")
-            self.statusBar.showMessage("Already stopped")
+            self.statusBar.showMessage("Already stopped or not running at all.")

@@ -116,7 +116,6 @@ class SaveFiles:
         # open to append rest oft required dict and convert to photon-hdf5
         dictionary = self.loadSetsDict(path / 'HDF_additional_info.p')
         self._hdf_dict.update(dictionary)
-        print(self._hdf_dict)
         self._hdf_dict = self._mask.maskWindow(self._hdf_dict)
 
         del self._mask
