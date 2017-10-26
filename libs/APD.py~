@@ -197,15 +197,7 @@ class APD:
         @param task: task name
         @param readArray: ndarray
         """
-        """
         task.ReadCounterU32(numSampsPerChan=self._sampNumber,
-                            timeout=50.0,
-                            readArray=readArray,
-                            arraySizeInSamps=self._sampNumber,    # deleted a +1, check if problem
-                            sampsPerChanRead=self._read,
-                            reserved=None)
-        """
-        task.ReadCounterF64(numSampsPerChan=self._sampNumber,
                             timeout=50.0,
                             readArray=readArray,
                             arraySizeInSamps=self._sampNumber,    # deleted a +1, check if problem

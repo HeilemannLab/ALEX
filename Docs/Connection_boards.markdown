@@ -2,20 +2,24 @@
 
 Laser green:
 
-* Digital:
-  + APD (sampling): 6612 Counters 0 and 1, Source
-  + AOTF: 6612 Counter 4 Out
-
-* Analog: 6713 AO.1
+    * Connect to AOTF Line 1 on the Box (100.319 MHz)
+    * Digital: 6612 Counter 4 Out
+    * Analog: 6713 AO.1
 
 Laser red:
 
-* Digital:
-  + APD (sampling): 6612 Counters 2 and 3, Source
-  + AOTF: 6612 Counter 5 Out
-
-* Analog: 6713 AO.0
+    * Connect to AOTF Line 2 on the Box (78.91 MHz)
+    * Digital: 6612 Counter 5 Out
+    * Analog: 6713 AO.0
 
 APD gate signals:
 
-* 6612 Counters 6 and 7, Out
+    * 6612 Counters 6 and 7, Out
+    * Connect to Gate 1 and Gate 2 (exchangeable)
+    * Connect APD OUT 1 and 2 to the APDs (exchangeable, into GATE)
+
+ APD sampling:
+
+    * BNC T pieces directly at the APD    
+    * Green APD: 6612 Counters 0 and 1, Source
+    * Red APD: 6612 Counters 2 and 3, Source

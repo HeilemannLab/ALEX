@@ -200,7 +200,7 @@ class APD:
         task.ReadCounterU32(numSampsPerChan=self._sampNumber,
                             timeout=50.0,
                             readArray=readArray,
-                            arraySizeInSamps=self._sampNumber,    # deleted a +1, check if problem
+                            arraySizeInSamps=self._sampNumber,
                             sampsPerChanRead=self._read,
                             reserved=None)
         return readArray

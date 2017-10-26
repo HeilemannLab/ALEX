@@ -40,7 +40,7 @@ class Animation:
         self._redLine = 0
         self._figure = pyplot.figure()
         self.anim = 0
-        self._axLimit = 1e6
+        self._axLimit = 1e3
 
     def run(self):
         """
@@ -168,19 +168,6 @@ class Animation:
                                             blit=True,
                                             repeat=True)
         pyplot.show()
-
-    def stopAndHandleQ(self):
-        self.anim._stop()
-        while not self._animDataQ1.empty() and not self._animDataQ2.empty():
-            try:
-                self._animDataQ1.get_nowait()
-                self._animDataQ2.get_nowait()
-            except:
-                pass
-            try:
-                self._animDataQ2.get_nowait()
-            except:
-                pass
 
     def __del__(self):
         """
