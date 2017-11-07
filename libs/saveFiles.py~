@@ -141,7 +141,7 @@ class SaveFiles:
         f1 = tables.open_file(str(path / 'smALEX_APD1.hdf'), 'r')
         # rows1 = f1.root.timestamps[:, 0]
         row = f1.root.timestamps[:, :]
-        rows1 = np.ndarray(row)
+        rows1 = np.array(row, dtype=np.int64)
         f1.flush()
         f1.close()
 
@@ -149,7 +149,7 @@ class SaveFiles:
         f2 = tables.open_file(str(path / 'smALEX_APD2.hdf'), 'r')
         # rows2 = f2.root.timestamps[:, 0]
         row = f2.root.timestamps[:, :]
-        rows2 = np.ndarray(row)
+        rows2 = np.array(row, dtype=np.int64)
         f2.flush()
         f2.close()
 

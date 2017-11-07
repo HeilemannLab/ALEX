@@ -115,6 +115,7 @@ class APD:
                                         activeEdge=DAQmx_Val_Rising,
                                         sampleMode=DAQmx_Val_ContSamps)
         self._counter1.SetSampClkOverrunBehavior(data=DAQmx_Val_IgnoreOverruns)
+        self._counter1.SetCIDupCountPrevent("/Dev2/ctr0", True)
         self._rollover1.SetCIDupCountPrevent("/Dev2/ctr1", True)
         self._rollover1.CfgSampClkTiming(sampsPerChan=self._buffer,              # This is sampsPerChanToAcquire argument
                                          source="/Dev2/PFI35",
@@ -134,6 +135,7 @@ class APD:
                                         sampsPerChan=self._buffer)
         self._counter2.SetSampClkOverrunBehavior(data=DAQmx_Val_IgnoreOverruns)
 
+        self._counter2.SetCIDupCountPrevent("/Dev2/ctr2", True)
         self._rollover2.SetCIDupCountPrevent("/Dev2/ctr3", True)
         self._rollover2.CfgSampClkTiming(source="/Dev2/PFI27",
                                          rate=10000000,
