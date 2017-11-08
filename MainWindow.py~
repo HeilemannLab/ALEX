@@ -651,7 +651,7 @@ class MainWindow(QMainWindow):
                 pass
 
             # joining
-            self.statusBar.showMessage("Stopped! Please wait while data is processed.")
+            self.statusBar.showMessage("Stopped! Please wait while data is being processed.")
             self._laser.join(timeout=3.0)
             self._u.join(timeout=3.0)
             self._counter1.join(timeout=10.0)

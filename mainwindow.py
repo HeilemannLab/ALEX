@@ -543,10 +543,10 @@ class MainWindow(QMainWindow):
             return
 
         # Initialize processes and waiter thread
-        self._counter1 = libs.Counter.Counter(self._running, self._dataQ1, self._readArraySize,
-                                              self._semaphore, 1)
         self._counter2 = libs.Counter.Counter(self._running, self._dataQ2, self._readArraySize,
                                               self._semaphore, 2)
+        self._counter1 = libs.Counter.Counter(self._running, self._dataQ1, self._readArraySize,
+                                              self._semaphore, 1)
         self._laser = libs.Laser.Laser(self._running, self._dict._a, self._semaphore)
         self._anim = libs.Animation.Animation(self._animDataQ1, self._animDataQ2, self.signal)
         self._dataProcesser1 = libs.DataProcesser.DataProcesser(self._dataQ1, self._animDataQ1,
@@ -558,8 +558,8 @@ class MainWindow(QMainWindow):
         self._u = Thread(target=self.waiter, args=(), name='iterator', daemon=True)
 
         # Starting all processes and threads
-        self._counter1.start()
         self._counter2.start()
+        self._counter1.start()
         self._laser.start()
         self._u.start()
         self._dataProcesser1.start()
@@ -651,7 +651,7 @@ class MainWindow(QMainWindow):
                 pass
 
             # joining
-            self.statusBar.showMessage("Stopped! Please wait while data is processed.")
+            self.statusBar.showMessage("Stopped! Please wait while data is being processed.")
             self._laser.join(timeout=3.0)
             self._u.join(timeout=3.0)
             self._counter1.join(timeout=10.0)
