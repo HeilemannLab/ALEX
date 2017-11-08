@@ -558,8 +558,8 @@ class MainWindow(QMainWindow):
         self._u = Thread(target=self.waiter, args=(), name='iterator', daemon=True)
 
         # Starting all processes and threads
-        self._counter1.start()
         self._counter2.start()
+        self._counter1.start()
         self._laser.start()
         self._u.start()
         self._dataProcesser1.start()
