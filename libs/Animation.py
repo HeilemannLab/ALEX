@@ -40,7 +40,7 @@ class Animation:
         self._redLine = 0
         self._figure = pyplot.figure()
         self.anim = 0
-        self._axLimit = 1e3
+        self._axLimit = 2e4
 
     def run(self):
         """
