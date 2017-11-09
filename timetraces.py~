@@ -51,10 +51,10 @@ def binnedTrace(array):
             trace.append(bins)
             n += 1
             bins = 0
-        if array[i] == array[-1]:
-            trace.append(bins)
-            n += 1
-            bins = 0
+        # if array[i] == array[-1]:
+        #     trace.append(bins)
+        #     n += 1
+        #     bins = 0
     return trace, n - 1
 
 

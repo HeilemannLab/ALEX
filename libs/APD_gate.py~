@@ -77,7 +77,17 @@ class APD:
                                                edge=DAQmx_Val_Rising,
                                                initialCount=0,
                                                countDirection=DAQmx_Val_CountUp)
-        self._rollover1.SetCICountEdgesTerm("", "/Dev2/PFI32")
+        self._rollover1.SetCICountEdgesTerm("", "/Dev2/PFI35")
+
+        self._counter1.SetCIDupCountPrevent("/Dev2/ctr0", True)
+        self._rollover1.SetCIDupCountPrevent("/Dev2/ctr1", True)
+
+        self._counter1.ExportSignal(signalID=DAQmx_Val_CounterOutputEvent,
+                                    outputTerminal="/Dev2/PFI35")
+        self._counter1.SetExportedCtrOutEventOutputBehavior(DAQmx_Val_Pulse)
+
+        self._counter1.SetSampClkOverrunBehavior(data=DAQmx_Val_IgnoreOverruns)
+        self._rollover1.SetSampClkOverrunBehavior(data=DAQmx_Val_IgnoreOverruns)
 
     def InitializeCounter2(self):
         self._counter2 = Task()
@@ -94,7 +104,17 @@ class APD:
                                                edge=DAQmx_Val_Rising,
                                                initialCount=0,
                                                countDirection=DAQmx_Val_CountUp)
-        self._rollover2.SetCICountEdgesTerm("", "/Dev2/PFI24")
+        self._rollover2.SetCICountEdgesTerm("", "/Dev2/PFI27")
+
+        self._counter2.SetSampClkOverrunBehavior(data=DAQmx_Val_IgnoreOverruns)
+        self._rollover2.SetSampClkOverrunBehavior(data=DAQmx_Val_IgnoreOverruns)
+
+        self._counter2.SetCIDupCountPrevent("/Dev2/ctr2", True)
+        self._rollover2.SetCIDupCountPrevent("/Dev2/ctr3", True)
+
+        self._counter2.ExportSignal(signalID=DAQmx_Val_CounterOutputEvent,
+                                    outputTerminal="/Dev2/PFI27")
+        self._counter2.SetExportedCtrOutEventOutputBehavior(DAQmx_Val_Pulse)
 
     def SamplingCounter1(self):
         """
@@ -110,43 +130,28 @@ class APD:
         tasks, where the sampling is slower than the input.
         """
         self._counter1.CfgSampClkTiming(sampsPerChan=self._buffer,              # This is sampsPerChanToAcquire argument
-                                        source="/Dev2/PFI39",
+                                        source="/Dev2/PFI38",
                                         rate=10000000,
                                         activeEdge=DAQmx_Val_Rising,
                                         sampleMode=DAQmx_Val_ContSamps)
-        self._counter1.SetSampClkOverrunBehavior(data=DAQmx_Val_IgnoreOverruns)
-        self._counter1.SetCIDupCountPrevent("/Dev2/ctr0", True)
-        self._rollover1.SetCIDupCountPrevent("/Dev2/ctr1", True)
         self._rollover1.CfgSampClkTiming(sampsPerChan=self._buffer,              # This is sampsPerChanToAcquire argument
-                                         source="/Dev2/PFI35",
+                                         source="/Dev2/PFI34",
                                          rate=10000000,
                                          activeEdge=DAQmx_Val_Rising,
                                          sampleMode=DAQmx_Val_ContSamps)
-        self._rollover1.SetSampClkOverrunBehavior(data=DAQmx_Val_IgnoreOverruns)
-        self._counter1.ExportSignal(signalID=DAQmx_Val_CounterOutputEvent,
-                                    outputTerminal="/Dev2/PFI32")
-        self._counter1.SetExportedCtrOutEventOutputBehavior(DAQmx_Val_Pulse)
 
     def SamplingCounter2(self):
-        self._counter2.CfgSampClkTiming(source="/Dev2/PFI31",
+        self._counter2.CfgSampClkTiming(source="/Dev2/PFI30",
                                         rate=10000000,
                                         activeEdge=DAQmx_Val_Rising,
                                         sampleMode=DAQmx_Val_ContSamps,
                                         sampsPerChan=self._buffer)
-        self._counter2.SetSampClkOverrunBehavior(data=DAQmx_Val_IgnoreOverruns)
 
-        self._counter2.SetCIDupCountPrevent("/Dev2/ctr2", True)
-        self._rollover2.SetCIDupCountPrevent("/Dev2/ctr3", True)
-        self._rollover2.CfgSampClkTiming(source="/Dev2/PFI27",
+        self._rollover2.CfgSampClkTiming(source="/Dev2/PFI26",
                                          rate=10000000,
                                          activeEdge=DAQmx_Val_Rising,
                                          sampleMode=DAQmx_Val_ContSamps,
                                          sampsPerChan=self._buffer)
-        self._rollover2.SetSampClkOverrunBehavior(data=DAQmx_Val_IgnoreOverruns)
-
-        self._counter2.ExportSignal(signalID=DAQmx_Val_CounterOutputEvent,
-                                    outputTerminal="/Dev2/PFI24")
-        self._counter2.SetExportedCtrOutEventOutputBehavior(DAQmx_Val_Pulse)
 
     def ArmStartCounter1(self):
         """
