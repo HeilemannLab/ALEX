@@ -74,39 +74,6 @@ class Animation:
         ax.set_xlabel("time")
         ax.set_ylabel("counts/sec")
 
-    def plot2(self):
-        """
-        This plot function provides two subplots with the red
-        channel data on the second plotting it in negative direction.
-        """
-        pyplot.style.use('seaborn-deep')
-
-        ax_green = self._figure.add_subplot(2, 1, 1)
-        ax_red = self._figure.add_subplot(2, 1, 2)
-
-        self._greenLine = Line2D([], [], color='green')
-        self._redLine = Line2D([], [], color='red')
-
-        ax_green.add_line(self._greenLine)
-        ax_red.add_line(self._redLine)
-
-        ax_green.set_xlim(0, 10)
-        ax_red.set_xlim(0, 10)
-        ax_green.set_ylim(-30, 10000000)
-        ax_red.set_ylim(1000000, -30)
-
-        ax_green.set_xlabel("time in [s]")
-        ax_red.set_xlabel("time in [s]")
-        ax_green.set_ylabel("counts")
-        ax_red.set_ylabel("counts")
-
-        ax_green.set_title("Green channel")
-        ax_red.set_title("Red channel")
-
-        # pyplot.tight_layout(pad=0.4, w_pad=0.5, h_pad=1.0)
-        self._figure.subplots_adjust(left=0.2, bottom=0.1, right=0.8,
-                                     top=0.9, wspace=0.1, hspace=0.8)
-
     def initAnimation(self):
         """
         'initAnimation' creates the initial Window for the
@@ -118,21 +85,23 @@ class Animation:
         self._redLine.set_data([], [])
         return self._greenLine, self._redLine,
 
-    def binnedTrace1(self, array):
-        n_bin = int(np.floor((array[-1] - array[0]) / (1e6)))
-        print(n_bin, array[-1])
+    def correctRollover(self, t1, n):
+        int_32 = (2**32) - 1
+        t1[:, 0] = t1[:, 0] + (int_32 * t1[:, 1])
+        return t1
+
+    def binnedTrace(self, array):
+        array = self.correctRollover(array)
+        n_bin = int(np.floor(self._readarray / 10))
         trace = np.zeros([n_bin, 1], dtype=np.int32)    # which data format is suitable?
         j = 0
         for i in range(len(trace)):
-            bins = 0
-            t_m = (i + 1) * 1e6
-            while (array[j] < t_m):    # and (array[j] >= t_m - (1e5)):
-                bins += 1
-                j += 1
-            trace[i] = bins
-        trace[:] = [x / 10.0 for x in trace]   # 10 ms bins
-        # n_bin = np.arange(n_bin)
-        return trace   # , n_bin
+            n1 = array[j, 0]
+            n2 = array[j + 10, 0]
+            trace[i] = 1e8 * (10.0 / (n2 - n1))
+            j += 10
+        n_bin = np.arange(n_bin)
+        return trace, n_bin
 
     def updateAnimation(self, i):
         """
@@ -153,11 +122,12 @@ class Animation:
         # This try/except section looks ugly, but it works good for unstable data influx.
         try:
             green = self._animDataQ1.get(timeout=1.0)
-            green, t_green = self._binnedTrace(green)
+            green, t_green = self.binnedTrace(green)
             if green[np.where(green >= 15000000)].sum():
                 self._signal.warning.emit()
         except:
             green = 0
+            t_green = 1
         try:
             red = self._animDataQ2.get(timeout=1.0)
             red, t_red = self._binnedTrace(red)
@@ -165,6 +135,7 @@ class Animation:
                 self._signal.warning.emit()
         except:
             red = 0
+            t_red = 1
         self._greenData += green.tolist()
         self._redData += red.tolist()
         x = [sum(green) / self._readarray, sum(red) / self._readarray]
@@ -192,6 +163,6 @@ class Animation:
 
     def __del__(self):
         """
-        Use to control program flow
+        Use to understand program flow
         """
         print("Animation class instance removed")
