@@ -544,20 +544,20 @@ class MainWindow(QMainWindow):
             return
 
         # Initialize processes and waiter thread
-        duration = self._dict._a["Duration"]
+        self._duration = self._dict._a["Duration"]
         self._counter2 = libs.Counter.Counter(self._running, self._dataQ2, self._readArraySize,
                                               self._semaphore, 2)
         self._counter1 = libs.Counter.Counter(self._running, self._dataQ1, self._readArraySize,
                                               self._semaphore, 1)
         self._laser = libs.Laser.Laser(self._running, self._dict._a, self._semaphore)
-        self._anim = libs.Animation_precise.Animation(self._animDataQ1, self._animDataQ2, self.signal, duration, self._readArraySize)
+        self._anim = libs.Animation_precise.Animation(self._animDataQ1, self._animDataQ2, self.signal, self._duration, self._readArraySize)
         self._dataProcesser1 = libs.DataProcesser.DataProcesser(self._dataQ1, self._animDataQ1,
                                                                 self._readArraySize, 1, new_folder)
         self._dataProcesser2 = libs.DataProcesser.DataProcesser(self._dataQ2, self._animDataQ2,
                                                                 self._readArraySize, 2, new_folder)
         self.statusBar.showMessage("Started!")
         self._anim.run()
-        self._u = Thread(target=self.waiter, args=(), name='iterator', daemon=True)
+        self._u = Thread(target=self.waiter, args=(duration), name='iterator', daemon=True)
 
         # Starting all processes and threads
         self._counter2.start()
@@ -569,7 +569,7 @@ class MainWindow(QMainWindow):
         self._anim.animate()    # this command is vicious, it seems everything following
                                 # it gets delayed or not executed at all. Best always called last.
 
-    def waiter(self, duration):
+    def waiter(self):
         """
         Illumination and APDs acquire the semaphore after initialization of tasks,
         the waiter waits for the semaphore to have its internal counter down to zero
@@ -586,8 +586,8 @@ class MainWindow(QMainWindow):
             self.progress.setRange(0, 0)
         else:
             # duration = self._dict._a["Duration"]
-            duration_iter = np.arange(duration)
-            self.progress.setRange(0, duration)
+            duration_iter = np.arange(self._duration)
+            self.progress.setRange(0, self._duration)
             for sec in duration_iter:
                 time.sleep(1)
                 self.signal.measurementProgress.emit(sec)

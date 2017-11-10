@@ -36,7 +36,8 @@ class Animation:
         self._duration = (duration + 1) * 100
         self._readarray = readarray
         self._dt = 0.1
-        self._tdata = [0]
+        self._t_green = [0]
+        self._t_red = [0]
         self._greenData = [0]
         self._redData = [0]
         self._greenLine = 0
@@ -85,21 +86,23 @@ class Animation:
         self._redLine.set_data([], [])
         return self._greenLine, self._redLine,
 
-    def correctRollover(self, t1, n):
+    def correctRollover(self, t1):
         int_32 = (2**32) - 1
         t1[:, 0] = t1[:, 0] + (int_32 * t1[:, 1])
         return t1
 
     def binnedTrace(self, array):
+        if len(array) < 2:
+            return array, np.array([1])
         array = self.correctRollover(array)
         n_bin = int(np.floor(self._readarray / 10))
         trace = np.zeros([n_bin, 1], dtype=np.int32)    # which data format is suitable?
         j = 0
-        for i in range(len(trace)):
+        for i in range(len(trace) - 1):
             n1 = array[j, 0]
-            n2 = array[j + 10, 0]
-            trace[i] = 1e8 * (10.0 / (n2 - n1))
             j += 10
+            n2 = array[j, 0]
+            trace[i] = 1e8 * (10.0 / (n2 - n1))
         n_bin = np.arange(n_bin)
         return trace, n_bin
 
@@ -122,27 +125,34 @@ class Animation:
         # This try/except section looks ugly, but it works good for unstable data influx.
         try:
             green = self._animDataQ1.get(timeout=1.0)
-            green, t_green = self.binnedTrace(green)
-            if green[np.where(green >= 15000000)].sum():
-                self._signal.warning.emit()
+            # green, t_green = self.binnedTrace(green)
+            # if green[np.where(green >= 15000000)].sum():
+            #     self._signal.warning.emit()
         except:
-            green = 0
+            green = np.zeros([1])
             t_green = 1
         try:
             red = self._animDataQ2.get(timeout=1.0)
-            red, t_red = self._binnedTrace(red)
-            if red[np.where(red >= 15000000)].sum():
-                self._signal.warning.emit()
+            # red, t_red = self._binnedTrace(red)
+            # if red[np.where(red >= 15000000)].sum():
+            #     self._signal.warning.emit()
         except:
-            red = 0
+            red = np.zeros([1])
             t_red = 1
+        green, t_green = self.binnedTrace(green)
+        if green[np.where(green >= 15e6)].sum():
+            self._signal.warning.emit()
+        red, t_red = self.binnedTrace(red)
+        if red[np.where(red >= 15e6)].sum():
+            self._signal.warning.emit()
+
         self._greenData += green.tolist()
         self._redData += red.tolist()
         x = [sum(green) / self._readarray, sum(red) / self._readarray]
         self._signal.displayRates.emit(x)
 
-        self._t_green.append(self._t_green[-1] + t_green)
-        self._t_red.append(self._t_red[-1] + t_red)
+        self._t_green += t_green.tolist()
+        self._t_red += t_red.tolist()
         self._greenLine.set_data(self._t_green, self._greenData)
         self._redLine.set_data(self._t_red, self._redData)
         return self._greenLine, self._redLine,
