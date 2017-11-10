@@ -47,7 +47,7 @@ class DataProcesser(Process):
         so data must not be saved. If there's a folder, data gets
         saved there.
         """
-        if (self._folder == 'Cont') or (self._folder is None):
+        if self._folder == 'Cont':
             self.dataProcessing_cont()
         else:
             self.dataProcessing_finite()

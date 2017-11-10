@@ -135,7 +135,7 @@ class APD:
                                         activeEdge=DAQmx_Val_Rising,
                                         sampleMode=DAQmx_Val_ContSamps)
         self._rollover1.CfgSampClkTiming(sampsPerChan=self._buffer,              # This is sampsPerChanToAcquire argument
-                                         source="/Dev2/PFI34",
+                                         source="/Dev2/PFI38",
                                          rate=10000000,
                                          activeEdge=DAQmx_Val_Rising,
                                          sampleMode=DAQmx_Val_ContSamps)
@@ -147,7 +147,7 @@ class APD:
                                         sampleMode=DAQmx_Val_ContSamps,
                                         sampsPerChan=self._buffer)
 
-        self._rollover2.CfgSampClkTiming(source="/Dev2/PFI26",
+        self._rollover2.CfgSampClkTiming(source="/Dev2/PFI30",
                                          rate=10000000,
                                          activeEdge=DAQmx_Val_Rising,
                                          sampleMode=DAQmx_Val_ContSamps,

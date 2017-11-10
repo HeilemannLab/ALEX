@@ -9,7 +9,8 @@
 # Department: Single Molecule Biophysics
 # License: GPL3
 #####################################################################'''
-import libs.APD
+import libs.APD_gate
+# import libs.APD
 import numpy as np
 from multiprocessing import Process
 
@@ -37,7 +38,7 @@ class Counter(Process):
         self._data = np.zeros([self._readArraySize, 2], dtype=int)
         self._sem = semaphore
         self._N = N
-        self._apd = libs.APD.APD(self._readArraySize, self._N, self._sem)
+        self._apd = libs.APD_gate.APD(self._readArraySize, self._N, self._sem)
 
     def run(self):
         """

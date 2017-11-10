@@ -66,7 +66,7 @@ def binnedTrace1(array):
     for i in range(len(trace)):
         bins = 0
         t_m = (i + 1) * 1e6
-        while (array[j] < t_m) and (array[j] >= t_m - (1e6)):
+        while (array[j] < t_m):    # and (array[j] >= t_m - (1e5)):
             bins += 1
             j += 1
         trace[i] = bins
@@ -85,26 +85,28 @@ red_trace = np.array(f.root.timestamps[:, :], dtype=np.float)
 f.flush()
 f.close()
 
-green_trace, red_trace = correctRollover(green_trace, red_trace)
-# green_trace = correct2(green_trace)
-# red_trace = correct2(red_trace)
+# green_trace, red_trace = correctRollover(green_trace, red_trace)
+green_trace = correct2(green_trace)
+red_trace = correct2(red_trace)
 
 green_trace, num1 = binnedTrace(green_trace[:, 0])
-green_trace[:] = [x / 10.0 for x in green_trace]
+green_trace[:] = [x / 10.0 for x in green_trace]   # 10 ms bins
+# green_trace[:] = [x * 10.0 for x in green_trace]   # 100 us bins
 num1 = np.arange(num1)
 
 red_trace, num2 = binnedTrace(red_trace[:, 0])
 red_trace[:] = [x / 10.0 for x in red_trace]
+# red_trace[:] = [x * 10.0 for x in red_trace]   # 100 us bins
 num2 = np.arange(num2)
 
 fig = plt.figure()
 ax1 = fig.add_subplot(2, 1, 1)
 ax1.plot(num1, green_trace, 'g')
 ax1.set_ylabel('kHz')
-ax1.set_xlabel('10 ms')
+ax1.set_xlabel('ms')
 
 ax2 = fig.add_subplot(2, 1, 2)
-ax2.set_xlabel('10 ms')
+ax2.set_xlabel('ms')
 ax2.set_ylabel('kHz')
 ax2.plot(num2, red_trace, 'r')
 
