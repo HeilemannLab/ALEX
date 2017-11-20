@@ -22,16 +22,7 @@ class HDFmask(QDialog):
     def __init__(self):
         super(HDFmask, self).__init__()
         self._dict = dict()
-        """
-        self._dict = {"author_affiliation": "Institute for Physical and Theoretical Chemistry, Goethe University Frankfurt",
-                          "author": "Your name",
-                          "sample_name": "Sample",
-                          "buffer_name": "Buffer",
-                          "dye_names": "Dye names, seperated by comma",
-                          "description": "Detailed description",
-                          "num_dyes": int(2)}
-        self.initWindow()
-        """
+        self._saveNote = False
 
     def initWindow(self):
         label1 = QLabel("Author")
@@ -70,7 +61,7 @@ class HDFmask(QDialog):
         line8.textChanged.connect(lambda: self.setitem("num_dyes", int(line8.text())))
 
         saveButton = QPushButton("Save")
-        saveButton.clicked.connect(self.close)
+        saveButton.clicked.connect(self.closeWindow)
 
         vbox = QVBoxLayout()
         vbox.addWidget(label1)
@@ -98,14 +89,18 @@ class HDFmask(QDialog):
                           "author": "Your name",
                           "sample_name": "Sample",
                           "buffer_name": "Buffer",
-                          "dye_names": "Dye names, seperated by comma",
+                          "dye_names": "Dye names, separated by comma",
                           "description": "Detailed description",
                           "num_dyes": int(2)}
         else:
             self._dict.update(dictionary)
         self.initWindow()
         self.exec_()
-        return self._dict
+        return self._dict, self._saveNote
 
     def setitem(self, key, value):
         self._dict[key] = value
+
+    def closeWindow(self):
+        self._saveNote = True
+        self.close()

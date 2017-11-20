@@ -6,8 +6,8 @@
     <coordinates>
       <x>20</x>
       <y>20</y>
-      <w>230</w>
-      <h>430</h>
+      <w>380</w>
+      <h>460</h>
     </coordinates>
     <panel_attributes>APD
 APD.py
@@ -27,16 +27,16 @@ APD.py
 - _rollover1: daqmx.task
 - _rollover2: daqmx.task
 --
-- __init__(int readArraySize, int N, Semaphore semephore)
+- __init__(int readArraySize, int N, Semaphore semaphore)
 - startCounting()
 - InitializeCounter1
-- IntializeCounter2
+- InitializeCounter2
 - SamplingCounter1()
 - SamplingCounter2()
 - ArmStartCounter1()
 - ArmStartCounter2()
 - readAPD()
-- actualCounting()
+- actualCounting(daqmx.Task task, ndarray readArray )
 - stopCounting()
 
 </panel_attributes>

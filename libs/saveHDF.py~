@@ -69,7 +69,7 @@ class SaveHDF:
                      excitation_wavelengths=[532e-9, 640e-9],            # List of excitation wavelenghts
                      excitation_cw=[True],                               # List of booleans, True if wavelength is CW
                      detection_wavelengths=[580e-9, 640e-9],             # Nominal center wavelength each for detection ch
-                     excitation_alternated=[True])
+                     excitation_alternated=[True, True])
 
         provenance = dict(filename='raw data',
                           software='')

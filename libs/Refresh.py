@@ -14,8 +14,9 @@ import libs.UIsettings
 
 class Refresh:
     """
-    The refresh class provides methods to set new values on the dictionary and match dependent values,
-    like sliders with their corresponding spinbox.
+    The refresh class provides methods to set new values
+    on the dictionary and match dependent values, like sliders
+    with their corresponding spinbox.
     """
     def __init__(self):
         self._dict = libs.UIsettings.UIsettings()
@@ -24,7 +25,7 @@ class Refresh:
         """
         Sorts the type of change, passes changeKey and value
         @param changeType: str
-        @param changeKey: Key
+        @param changeKey: str
         @param value: int or float
         """
         if changeType == 0:
@@ -32,13 +33,12 @@ class Refresh:
         if changeType == 1:
             self.refreshBoxSettings(changeKey, value)
         if changeType == 2:
-            self.changeRadioButton(changeKey)   # check if this here is necessary)
+            self.changeRadioButton(changeKey)
             self.changeRadioButton(value)
         if changeType == 3:
             self._dict._a = changeKey
         return self._dict._a
 
-    # Input functions
     def changeRadioButton(self, b):
         """
         The radiobuttons change their state only over the 'isChecked'

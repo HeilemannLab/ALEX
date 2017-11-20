@@ -13,25 +13,25 @@
 
 class UIsettings:
     """
-    The UIsetting class hosts a dictionary which holds all the key parameters to the measurement.
+    The UIsetting class hosts a dictionary which
+    holds all the key parameters to the measurement.
     Methods 'getitem' and 'setitem' are outdated.
     """
     def __init__(self):
-        a = {}
-        a["lpower red"] = 50.0
-        a["lpower green"] = 50.0
-        a["laser frequency"] = 10000.0
-        a["Radio"] = 0
-        a["Duration"] = 300
-        a["laser percentageG"] = 50
-        a["laser percentageR"] = 50
-        self._folder = 'C:/'
-        self._a = a
+        self._a = {}
+        self._a["lpower red"] = 50.0
+        self._a["lpower green"] = 50.0
+        self._a["laser frequency"] = 10000.0
+        self._a["Radio"] = 0
+        self._a["Duration"] = 300
+        self._a["laser percentageG"] = 50
+        self._a["laser percentageR"] = 50
 
     def getitem(self, item):
         """
         Read the dict item by its key and return it.
         @param item: string
+        @return: float
         """
         return self._a[item]
 

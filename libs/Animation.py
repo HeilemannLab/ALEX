@@ -32,7 +32,7 @@ class Animation:
         self._animDataQ1 = animDataQ1
         self._animDataQ2 = animDataQ2
         self._signal = signal
-        self._dt = 0.1
+        self._dt = 0.01
         self._tdata = [0]
         self._greenData = [0]
         self._redData = [0]
@@ -53,23 +53,26 @@ class Animation:
         """
         This plot function provides one plot, where both datasets
         are plotted into. The red APD data is multiplied with -1.
-        The style is a seaborn one.
+        The style is a seaborn one, where the figure and the plot
+        background are darkened to avoid a glaring display.
         """
-        # pyplot.style.use('seaborn-deep')
-        sns.set()   # seaborn plot style
-        ax = self._figure.add_subplot(111)
+        # sns.set()   # seaborn plot style
+        sns.set_context('paper')
+        with sns.axes_style("darkgrid", {'axes.facecolor': '0.8',
+                                         'figure.facecolor': '0.85'}):
+            ax = self._figure.add_subplot(111)
 
-        self._greenLine = Line2D([], [], color='green')
-        self._redLine = Line2D([], [], color='red')
+            self._greenLine = Line2D([], [], color='green')
+            self._redLine = Line2D([], [], color='red')
 
-        ax.add_line(self._greenLine)
-        ax.add_line(self._redLine)
+            ax.add_line(self._greenLine)
+            ax.add_line(self._redLine)
 
-        ax.set_xlim(0, 10)
-        ax.set_ylim(-self._axLimit, self._axLimit)
+            ax.set_xlim(0, 10)
+            ax.set_ylim(-self._axLimit, self._axLimit)
 
-        ax.set_xlabel("time")
-        ax.set_ylabel("counts/sec")
+            ax.set_xlabel("Time")
+            ax.set_ylabel("Hz")
 
     def plot2(self):
         """
@@ -100,13 +103,12 @@ class Animation:
         ax_green.set_title("Green channel")
         ax_red.set_title("Red channel")
 
-        # pyplot.tight_layout(pad=0.4, w_pad=0.5, h_pad=1.0)
         self._figure.subplots_adjust(left=0.2, bottom=0.1, right=0.8,
                                      top=0.9, wspace=0.1, hspace=0.8)
 
     def initAnimation(self):
         """
-        'initAnimation' creates the initial Window for the
+        This method creates the initial Window for the
         'funcAnimation' method. It it passed as a parameter,
         but it's optional, so this can be skipped. But note
         that the LinePlot has to be initialized then otherwise.
@@ -118,27 +120,31 @@ class Animation:
     def updateAnimation(self, i):
         """
         The data is retrieved from the queues in an try/except
-        block to avoid errors/blocking. In there also the signal
-        'displayRates' gets emitted with a two-item-list[green, red].
+        block to avoid errors/blocking. If there is no item to get
+        in an interval of 1 second, the program proceeds and sets
+        the value to zero. Also the signal 'displayRates' gets
+        emitted with a two-item-list[green, red] (This is a rather
+        quwirky work-around, since pyqt signals can only be emitted
+        from threads, but not from subprocesses.)
         @param i: iterable
         This parameter is necessary for the animation, it passes the
-        'frames' argument as an iterator somehow. Documtation does
-        not entirely reveal how this works.
+        'frames' argument as an iterator/generator somehow. Documentation does
+        not entirely reveal how this works. The 'warning' signal should
+        warn the user about very high counts (15MHz), which may damage the
+        detectors.
         """
         if self._tdata[-1] > 10:
             self._tdata = [0]
             self._greenData = [self._greenData[-1]]
             self._redData = [self._redData[-1]]
-        # This try/except section looks ugly, but it works good for unstable data influx.
-        # The print error statement in except can be neglected in real mesurements.
+        # This try/except section looks ugly, but it works good for
+        # unstable data influx.
         try:
             green = float(1e8) * self._animDataQ1.get(timeout=1.0)
             if (green >= 15000000):
                 self._signal.warning.emit()
         except:
             green = 0
-            # print("error getting data for animation")
-            # pass
         try:
             red = float(1e8) * (-1) * self._animDataQ2.get(timeout=1.0)
             if ((-1 * red) >= 15000000):
@@ -170,7 +176,4 @@ class Animation:
         pyplot.show()
 
     def __del__(self):
-        """
-        Use to control program flow
-        """
         print("Animation class instance removed")

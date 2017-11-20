@@ -26,13 +26,13 @@ from PyQt5.QtCore import Qt, pyqtSignal, QObject, pyqtSlot
 
 import libs.UIsettings
 import libs.Refresh
-# import libs.Animation
-import libs.Animation_precise
+import libs.Animation
 import libs.Counter
 import libs.Laser
 import libs.DataProcesser
 import libs.SaveFiles
 import libs.ChangeReadArray
+import libs.Timetraces
 
 
 class Communicate(QObject):
@@ -82,6 +82,7 @@ class MainWindow(QMainWindow):
         self._dict = libs.UIsettings.UIsettings()
         self._files = libs.SaveFiles.SaveFiles()
         self._changeRA = libs.ChangeReadArray.ChangeReadArray()
+        self._timetrace = libs.Timetraces.Timetrace()
         self._r = libs.Refresh.Refresh()
         self._readArraySize = int(1e3)
 
@@ -420,11 +421,22 @@ class MainWindow(QMainWindow):
         fileMenue.addAction(self.closeApp)
 
     def getFilename(self):
+        """
+        Select a file with qdialog.
+        The return value of qdialog
+        'getOpenFileName' is list
+        containing the filter information
+        and the absolute path.
+        @return: path
+        """
         start = 'C:/Users/Karoline2'
         path = QFileDialog.getOpenFileName(None, 'Select file', start)
         return path[0]
 
     def getDirectory(self):
+        """
+        Select a directory with qdialog.
+        """
         start = 'C:/Users/Karoline2'
         path = QFileDialog.getExistingDirectory(None, 'Select directory', start, QFileDialog.ShowDirsOnly)
         return path
@@ -434,6 +446,9 @@ class MainWindow(QMainWindow):
         self._location.setText(path)
 
     def loadDict(self):
+        """
+        Load a settings dict from a '*.p' file.
+        """
         path = self.getFilename()
         new_dict = self._files.loadSetsDict(path)
         if new_dict is not None:
@@ -445,7 +460,6 @@ class MainWindow(QMainWindow):
 
     def closeApplication(self):
         """Close the app and animation window via file menue."""
-
         choice = QMessageBox.question(self, 'Quit!', 'Really quit session?', QMessageBox.Yes | QMessageBox.No)
         if choice == QMessageBox.Yes:
             try:
@@ -471,9 +485,9 @@ class MainWindow(QMainWindow):
         The values can only be applied if the event variable self._running is set
         to False. Changes are processed in refresher.refreshUI method, which returns
         a whole new dictionary.
-        :param changeType: str
-        :param changeKey: str
-        :param value: int or float
+        @param changeType: str
+        @param changeKey: str
+        @param value: int or float
         """
         if self._running.is_set():
             self.statusBar.showMessage("Please don't change parameters during measurement. Stop and restart with new settings.")
@@ -503,6 +517,13 @@ class MainWindow(QMainWindow):
         self.sb_percentR.setValue(self._dict._a["laser percentageR"])
 
     def startBtn(self):
+        """
+        Set the flag of '_running' to True and close
+        all active (additional) windows. Then start
+        the processes. If users click on start while
+        the measurement is already running, a message
+        'Already running' is displayed.
+        """
         if not self._running.is_set():
             self._running.set()
             try:
@@ -518,7 +539,9 @@ class MainWindow(QMainWindow):
         Calls the hdf mask, from which the sample name gets retrieved. Combined with
         actual date and time, it creates a new folder in the 'location' directory.
         Measurements settings and hdf info get saved into that new folder as .p and
-        .txt files.
+        .txt files. If the hdfmask window is not exited by 'save', the measurement
+        will be canceled.
+        @return: str
         """
         if self._dict._a["Radio"] == 0:
             new_folder = 'Cont'
@@ -526,20 +549,20 @@ class MainWindow(QMainWindow):
         elif self._dict._a["Radio"] == 1:
             if self._location.text():
                 new_folder = self._files.saveRawData(self._location.text(), self._dict._a)
+                if not new_folder:
+                    return 0
             else:
                 self.statusBar.showMessage('Please select a file directory!')
-                new_folder = None
-        else:
-            print("Somethings happening here...")
+                new_folder = 0
         return new_folder
 
     def startProcesses(self):
         """Get folder and start all processes and threads."""
-        new_folder = self.finalLocation()
-        if new_folder:
+        self._new_folder = self.finalLocation()
+        if self._new_folder:
             pass
         else:
-            self.statusBar.showMessage('Please select a file location with the "Browse" button.')
+            self.statusBar.showMessage('Please select a file location with the "Browse" button or save specs.')
             self._running.clear()
             return
 
@@ -550,14 +573,14 @@ class MainWindow(QMainWindow):
         self._counter1 = libs.Counter.Counter(self._running, self._dataQ1, self._readArraySize,
                                               self._semaphore, 1)
         self._laser = libs.Laser.Laser(self._running, self._dict._a, self._semaphore)
-        self._anim = libs.Animation_precise.Animation(self._animDataQ1, self._animDataQ2, self.signal, self._duration, self._readArraySize)
+        self._anim = libs.Animation.Animation(self._animDataQ1, self._animDataQ2, self.signal)
         self._dataProcesser1 = libs.DataProcesser.DataProcesser(self._dataQ1, self._animDataQ1,
-                                                                self._readArraySize, 1, new_folder)
+                                                                self._readArraySize, 1, self._new_folder)
         self._dataProcesser2 = libs.DataProcesser.DataProcesser(self._dataQ2, self._animDataQ2,
-                                                                self._readArraySize, 2, new_folder)
+                                                                self._readArraySize, 2, self._new_folder)
         self.statusBar.showMessage("Started!")
         self._anim.run()
-        self._u = Thread(target=self.waiter, args=(duration), name='iterator', daemon=True)
+        self._u = Thread(target=self.waiter, args=(), name='iterator', daemon=True)
 
         # Starting all processes and threads
         self._counter2.start()
@@ -601,6 +624,7 @@ class MainWindow(QMainWindow):
         """
         Setting the progressbar, it gets called
         solely by a pyqtSignal from the waiter thread.
+        @param i: int
         """
         self.progress.setValue(i)
 
@@ -618,13 +642,13 @@ class MainWindow(QMainWindow):
     def warnPopUp(self):
         """
         Called from Animation if the count rate of one of the APDs is
-        higher than 15000000 Hz (15Mc/s). It pops up a message window,
+        higher than 15MHz (15Mc/s). It pops up a message window,
         informing the user. Currently no stop mechanism is included,
         so the user has to stop the measurement mechanically.
         """
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Critical)
-        msg.setText("APD count should not exceed 15 MHz!\nStop the measurement and check APDs and sample.")
+        msg.setText("APD count should not exceed 15 MHz!\nStop the measurement, check APDs and sample.")
         msg.setWindowTitle("APD Warning")
         msg.exec()
 
@@ -656,33 +680,42 @@ class MainWindow(QMainWindow):
             self.statusBar.showMessage("Stopped! Please wait while data is being processed.")
             self._laser.join(timeout=3.0)
             self._u.join(timeout=3.0)
-            self._counter1.join(timeout=10.0)
-            self._counter2.join(timeout=10.0)
-            self._dataProcesser2.join(timeout=10.0)
-            self._dataProcesser1.join(timeout=10.0)
+            self._counter1.join(timeout=5.0)
+            self._counter2.join(timeout=5.0)
+            self._dataProcesser2.join(timeout=5.0)
+            self._dataProcesser1.join(timeout=5.0)
 
             # extensive checking for joining
+            check = 0
             if self._dataProcesser1.is_alive():
                 print("DataProcesser 1 did not join.")
                 del self._dataProcesser1
+                check += 1
             if self._dataProcesser2.is_alive():
                 print("DataProcesser 2 did not join.")
                 del self._dataProcesser2
+                check += 1
             if self._counter1.is_alive():
                 print("Counter 1 did not join.")
                 del self._counter1
+                check += 1
             if self._counter2.is_alive():
                 print("Counter 2 did not join.")
                 del self._counter2
+                check += 1
             if self._u.is_alive():
                 print("Waiter thread did not join.")
                 del self._u
+                check += 1
             if self._laser.is_alive():
                 print("Laser did not join.")
                 del self._laser
-            else:
+                check += 1
+            if not check:
                 print("All workers have joined.")
 
+            # Print the timetrace of the data, is also saved as *.png into the data folder
+            self._timetrace.doThings(self._new_folder)
             # Unfortunately there is no other way than deleting the queues
             # If not done so, the rest data will be shown in the next measurement
             # instead of the new data.

@@ -13,11 +13,11 @@
 PyQt5.QtCore.QObject
 MainWindow.py
 --
-- measurementProgress: pyqtSignal
-- startMeasurement: pyqtSignal
+- measurementProgress: pyqtSignal(int)
 - stopMeasurement: pyqtSignal
 - warning: pyqtSignal
-- displayRates: pyqtSignal
+- displayRates: pyqtSignal(list)
+- convertDone: pyqtSignal
 --
 - init()</panel_attributes>
     <additional_attributes/>

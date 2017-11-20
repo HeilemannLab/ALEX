@@ -12,13 +12,13 @@
     <panel_attributes>Timing
 Timing.py
 --
-- _dict: libs.UIsettings.UIsettings
+- _dict: dict
 - _timingPulse: daqmx.task
 - _freq: float
 --
 - __init__()
 - refreshSettings(dict dictionary)
-- Pulse()
+- InitClock()
 - startClock()
 - stopClock()
 </panel_attributes>

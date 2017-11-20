@@ -13,14 +13,13 @@
 DigitalSignal.py
 --
 - _sem: multiprocessing.Semaphore
-- _dict: libs.UIsettings.UIsettings
-- _analog.AnalogSignal.AnalogSignal
+- _dict: dict
 - _percentHighGreen: float
 - _percentHighRed: float
 - _frequency: float
 - _highTime: float
 - _lowTime: float
-- _initialdelayRed: float
+- _initialDelay_red: float
 - _highSil: float
 - _lowSil: float
 - _initialDelay_sil1: float

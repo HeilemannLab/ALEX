@@ -16,7 +16,7 @@ class SaveHDF:
     """
     This class should serve as tool to create a fully functional photon-HDF file. It is based upon
     the notebook example from phconvert by Antonino Ingargiola, but slightly changed. The data, specs
-    and attributes are organized in dictionaries. those will be transormed into 'groups' in the hdf5 file.
+    and attributes are organized in dictionaries. those will be transformed into 'groups' in the hdf5 file.
     The main method 'save_photon_hdf5' is stated to be applicable to an open hdf-file. Lastly the file gets
     checked by 'assert_valid_photon_hdf5' method.
     """
@@ -51,7 +51,8 @@ class SaveHDF:
                                  alex_offset=700,
                                  alex_excitation_period1=self._dictionary["period1"],   # example: [100, 1900]
                                  alex_excitation_period2=self._dictionary["period2"],   # example: [2100, 3900]
-                                 detectors_specs={'spectral_ch1': [0],             # list of donor's detector IDs, check if that's the correct assignment
+                                 detectors_specs={'spectral_ch1': [0],             # list of donor's detector IDs, check if
+                                                                                   # that's the correct assignment
                                                   'spectral_ch2': [1]})            # list of acceptor's detector IDs
         # This section should already be there
         photon_data = dict(measurement_specs=measurement_specs,
@@ -78,13 +79,13 @@ class SaveHDF:
                         author_affiliation=self._dictionary["author_affiliation"])
 
         sample = dict(num_dyes=self._dictionary["num_dyes"],                  # (integer) number of different dyes present in the samples.
-                      dye_names=self._dictionary["dye_names"],                # (string) comma-separated list of dye or fluorophore names (for example: "ATTO550, ATTO647N")
+                      dye_names=self._dictionary["dye_names"],                # (string) comma-separated list of dye or fluorophore names
+                                                                              # (for example: "ATTO550, ATTO647N")
                       buffer_name=self._dictionary["buffer_name"],            # (string) a user defined description for the buffer.
                       sample_name=self._dictionary["sample_name"])            # (string) a user defined description for the sample.
 
         # Here the dicts get assembled into one, so the hierarchical structure is formed
         self._data = dict(description=self._dictionary["description"],
-                          # acquisition_duration=self._dictionary["acquisition_duration"],
                           setup=setup,
                           photon_data=photon_data,
                           identity=identity,

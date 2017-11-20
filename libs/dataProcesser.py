@@ -60,10 +60,9 @@ class DataProcesser(Process):
         Data does NOT get saved.
         """
         for array in iter(self._dataQ.get, 'STOP'):
-            # n1 = array[0, 0] + (self._int_max * array[0, 1])
-            # n2 = array[-1, 0] + (self._int_max * array[-1, 1])
-            # self._animDataQ.put(self._readArraySize / (n2 - n1))
-            self._animDataQ.put(array)
+            n1 = array[0, 0] + (self._int_max * array[0, 1])
+            n2 = array[-1, 0] + (self._int_max * array[-1, 1])
+            self._animDataQ.put(self._readArraySize / (n2 - n1))
         print("DataProcesser %i sent all data and exits" % self._N)
 
     def dataProcessing_finite(self):
@@ -83,10 +82,9 @@ class DataProcesser(Process):
                                      filters=filters)
         for array in iter(self._dataQ.get, 'STOP'):
             timestamps.append(array)
-            # n1 = array[0, 0] + (self._int_max * array[0, 1])
-            # n2 = array[-1, 0] + (self._int_max * array[-1, 1])
-            # self._animDataQ.put(self._readArraySize / (n2 - n1))
-            self._animDataQ.put(array)
+            n1 = array[0, 0] + (self._int_max * array[0, 1])
+            n2 = array[-1, 0] + (self._int_max * array[-1, 1])
+            self._animDataQ.put(self._readArraySize / (n2 - n1))
         f.flush()
         f.close()
         print("DataProcesser %i sent all data and exits" % self._N)

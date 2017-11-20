@@ -44,7 +44,9 @@ class SaveFiles:
 
     def correctRollover(self, path, N):
         """
-        Correct rollover in the file. It avoids reading all the items into the RAM this way.
+        Correct rollover in the file. It avoids reading
+        all the items into the RAM this way. Unfortunately
+        this method takes enormous time to process the data.
         @param path: str
         @param N: int
         """
@@ -60,6 +62,10 @@ class SaveFiles:
         print("Rollover %i correction took %f seconds" % (N, t))
 
     def correctRolloverInRAM(self, t1, t2):
+        """
+        Rollover correction method which takes numpy arrays,
+        not files.
+        """
         t_start = time.time()
         int_32 = (2**32) - 1
         t1[:, 0] = t1[:, 0] + (int_32 * t1[:, 1])
@@ -70,25 +76,25 @@ class SaveFiles:
 
     def saveRawData(self, path, settings):
         """
-        The directory gets specified by user and named by the tag. Then a special
-        folder gets created. This should happen before the measurement starts. Also
-        the used settings should be saved in this folder, before the measurement.
-        This way it's guaranteed that the used settings are saved, even if the user
-        changes settings during the measurement.
+        Starting whith assembling the hdf info, the sample name gets used
+        as the folder name where all files get saved into. If the users
+        cancels the hdfMask, the function should return to the main loop
+        without executing a measurement. Also data between the dicts get
+        shared: Important is the ALEX period in its whole and the illumination
+        percentages. In fretbursts they are called 'alex period',
+        'alex_excitation_period1' and 'alex_excitation_period2'. Those must
+        be given in unit of timestamps, say 10ns.
         @param path: str
         @param settings: dict
+        @return: str
         """
-        # Start whith assembling the hdf info, import here will be the sample name,
-        # as it is used for the folder where all files get saved into. Also data
-        # between the dicts get shared: Important is the ALEX period in its whole
-        # and the illumination percentages. In fretbursts they are called 'alex period',
-        # 'alex_excitation_period1' and 'alex_excitation_period2'. Those must be given
-        # in unit of timestamps, say 10ns.
         self.refreshSettings(settings)
         whole_period = np.floor(1 / (self._dict._a["laser frequency"] * 1e-08))
         period1 = np.floor(whole_period * (self._dict._a["laser percentageG"]))
 
-        self._hdf_dict = self._mask.maskWindow(self._hdf_dict)
+        self._hdf_dict, saveNote = self._mask.maskWindow(self._hdf_dict)
+        if not saveNote:
+            return 0
         self._hdf_dict["alex_period"] = whole_period
         self._hdf_dict["period1"] = [10, period1 - 10]
         self._hdf_dict["period2"] = [period1 + 10, whole_period - 10]
@@ -97,28 +103,25 @@ class SaveFiles:
         path = pathlib.Path(path)
         folder = path / folder
         if folder.exists():
-            folder = folder / '_(1)'
-        else:
-            pass
+            folder = path / (folder.name + '_(1)')
         folder.mkdir()
 
         # dictionaries and plot get saved into 'folder'
         self.saveSetsDict(self._dict._a, folder, 'Measurement_settings')
         self.saveHdfDict(self._hdf_dict, folder, 'HDF_additional_info')
-
-        # self._plot.refreshSettings(self._dict._a)
-        # self._plot.plot(str(folder) + '/Illumination_scheme.png')
-        return folder    # folder must be returned to give it to the dataprocessers
+        return folder
 
     def convertToPhotonHDF5(self, path, signal):
         """
         This function does the converting from simple hdf5 files in one nice
-        photon-hdf5 file fit for usage with Fretbursts. First the arrays get corrected
-        for rollover seperatly in their file, then the arrays are loaded into RAM
-        (maybe check size) merged and sorted, and the created one and its corresponding
-        detector mask are written into a new hdf file. This one then gets enriched with
-        metadata, checked for validity and saved as photon-hdf5 file.
+        photon-hdf5 file fit for usage with Fretbursts. First the arrays get
+        corrected for rollover, merged and sorted, and the created one and
+        its corresponding detector mask are written into a new hdf file. This
+        one then gets enriched with metadata, checked for validity and saved
+        as photon-hdf5 file.
         @param path: str
+        @param signal: pyqt.Signal
+        @return: int
         """
         path = pathlib.Path(path)
 
@@ -128,18 +131,11 @@ class SaveFiles:
         self._hdf_dict = self._mask.maskWindow(self._hdf_dict)
 
         del self._mask
-        self._mask = libs.HDFmask.HDFmask()
-
-        # Rollover correction
-        # self.correctRollover(path, 1)
-        # self.correctRollover(path, 2)
-
-        # The arrays have to be written to the RAM, because currently the merging
-        # only happens in the RAM, until there's a solution writing on the hdf
-        # files only.
+        self._mask, saveNote = libs.HDFmask.HDFmask()
+        if not saveNote:
+            return 0
         # array 1
         f1 = tables.open_file(str(path / 'smALEX_APD1.hdf'), 'r')
-        # rows1 = f1.root.timestamps[:, 0]
         row = f1.root.timestamps[:, :]
         rows1 = np.array(row, dtype=np.int64)
         f1.flush()
@@ -147,7 +143,6 @@ class SaveFiles:
 
         # array 2
         f2 = tables.open_file(str(path / 'smALEX_APD2.hdf'), 'r')
-        # rows2 = f2.root.timestamps[:, 0]
         row = f2.root.timestamps[:, :]
         rows2 = np.array(row, dtype=np.int64)
         f2.flush()
@@ -165,6 +160,7 @@ class SaveFiles:
         self._saveHDF.saveAsHDF(str(path / 'smALEX.hdf'))
         print("Data stored in photon-hdf5.")
         signal.emit()
+        return 1
 
     def merge_timestamps(self, t1, t2):
         """

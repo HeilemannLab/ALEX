@@ -14,9 +14,9 @@ from PyDAQmx import *
 
 class Timing:
     """
-    This class configures the pulse train, which serves as trigger signal.
-    Maybe it could be changed to a single edge. The pulse is created on
-    the 6713 card, which should be 'Device 1'.
+    This class configures the pulse train, which serves as trigger signal
+    and as sample clock for the analog signal. The pulse train is created
+    on the 6713 card, which should be 'Device 1'.
     """
     def __init__(self):
         self._dict = dict()

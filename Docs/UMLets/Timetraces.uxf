@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>20</x>
+      <y>20</y>
+      <w>210</w>
+      <h>230</h>
+    </coordinates>
+    <panel_attributes>Timetraces
+Timetraces.py
+--
+- _green_trace: ndarray
+- _red_trace: ndarray
+- _num1: ndarray
+- _num2: ndarray
+--
+- __init__
+- ndarray, ndarray correctRollover(ndarray t1, ndarray t2)
+- ndarray, int binnedTrace(ndarray array)
+- ndarray, int binnedTrace1(ndarray array)
+- doThings(str directory)
+- process()
+- plot(str directory)</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>

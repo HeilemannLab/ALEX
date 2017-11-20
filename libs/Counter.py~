@@ -20,6 +20,8 @@ class Counter(Process):
     functionalty is to start the measurement via the APD class in a new
     process. The multiprocessing.Event variable 'running' is the control
     variable which enables control over the while loop from the mainwindow.
+    The class does not discriminate between 'Finite' or 'Continuous'
+    measurements, it the same either way.
     """
     def __init__(self, running, dataQ, readArraySize, semaphore, N):
         """

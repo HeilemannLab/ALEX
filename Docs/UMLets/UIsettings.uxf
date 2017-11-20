@@ -12,11 +12,10 @@
     <panel_attributes>UIsettings
 UIsettings.py
 --
-- a: dict
 - self._a: dict
 --
 - __init__()
-- getitem(string item)
+- float getitem(string item)
 - setitem(string item, float var)</panel_attributes>
     <additional_attributes/>
   </element>

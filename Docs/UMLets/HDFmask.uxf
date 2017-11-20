@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>20</x>
+      <y>20</y>
+      <w>260</w>
+      <h>180</h>
+    </coordinates>
+    <panel_attributes>HDFmask
+pyqt.QObject
+HDFmask.py
+--
+- _dict: dict
+- _saveNote: bool
+- line1 - line8: QLineEdit
+- label1 - label8: QLabel
+- saveButton: QPushButton
+--
+- __init__
+- initWindow()
+- dict, bool maskWindow(dict dictionary)
+- setitem(str key, float value)
+- closeWindow()
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>

@@ -6,20 +6,20 @@
     <coordinates>
       <x>20</x>
       <y>20</y>
-      <w>340</w>
+      <w>430</w>
       <h>220</h>
     </coordinates>
     <panel_attributes>Refresh
 Refresher.py
 --
-- _sets: dict
+- _dict: libs.UIsettings.UIsettings
 - changeKey: str
 - changeType: str
 - value: float
 - b: pyqt.RadioButton
 --
 - __init__()
-- refreshUI(str changeType, str changeKey, float value)
+- dict refreshUI(str changeType, str changeKey, float value)
 - changeRadioButton(pyqt.QRadioButton b)
 - refreshSliderSettings(str changeKey, float value)
 - refreshBoxSettings(str changeKey, float value)</panel_attributes>

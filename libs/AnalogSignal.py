@@ -1,5 +1,5 @@
 '''######################################################################
-# File Name: AnalogOutput.py
+# File Name: AnalogSignal.py
 # Project: ALEX
 # Version:
 # Creation Date: 2017_07_13
@@ -16,12 +16,14 @@ from PyDAQmx import *
 
 class AnalogSignal:
     """
-    The AnalogOutput class makes the connection to the DAQmx card 6713
+    The AnalogSignal class makes the connection to the DAQmx card 6713
     (which should be device 1 in NI MAX). Laser power sets the voltage
     height to a percentage between 0V and 5V. Stop method contains a short
     task that sets the channel to zero. It's necessary because tasks would
-    sometimes not go back to zero in idle position. The voltages get delivered
-    to pins 22 'Dev1/ao0' (Red) and 21 'Dev1/ao1' (Green).
+    sometimes not go back to zero in idle position. (Note there a chance that
+    it still does not go down. But the device combining digital and analog
+    signal suppresses the analog signal, if the digital one is zero.) The
+    voltages get delivered to pins 22 'Dev1/ao0' (Red) and 21 'Dev1/ao1' (Green).
     """
     def __init__(self):
         self._sampPoints = 2
@@ -59,7 +61,7 @@ class AnalogSignal:
         Analog tasks can be bundled and written with one sampling signal.
         The data is written to the channels in the order of the channels
         are created in the task. Sampling settings are internal clock and
-        the laser alterantion frequency.
+        the laser alternation frequency.
         """
         self.Intensities()
         self._analog_output = Task()

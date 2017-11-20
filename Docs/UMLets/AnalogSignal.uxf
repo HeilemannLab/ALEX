@@ -13,7 +13,7 @@
 AnalogSignal.py
 --
 - _sampPoints: int
-- _dict: libs.UIsettings.UIsettings
+- _dict: dict
 - _freq: float
 - _red: ndarray
 - _green: ndarray
@@ -24,7 +24,7 @@ AnalogSignal.py
 - _analog_output: daqmx.Task
 --
 - __init__()
-- refreshSettings(dict dict)
+- refreshSettings(dict dictionary)
 - Intensities()
 - InitAnalog()
 - startAnalog()

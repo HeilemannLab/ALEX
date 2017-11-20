@@ -7,22 +7,23 @@
       <x>20</x>
       <y>20</y>
       <w>400</w>
-      <h>280</h>
+      <h>300</h>
     </coordinates>
     <panel_attributes>SaveFiles
-saveFiles.py
+SaveFiles.py
 --
 - _dict: libs.UIsettings.UIsettings
 - _plot: libs.PlotIllumination.PlotIllumination
-- _mask = libs.HDFmask.HDFmask
-- _saveHDF = libs.SaveHDF.SaveHDF5
-- _hdf_dict: dictionary
+- _hdf_dict: dict
+- _mask: libs.HDFmask.HDFmask
+- _saveHDF: libs.SaveHDF.SaveHDF5
 --
 - __init__()
 - refreshSettings(dict dictionary)
 - correctRollover(str path, int N)
-- saveRawData(str path, dict settings)
-- ConvertToPhotonHDF5(str path)
+- correctRolloverInRAM(ndarray t1, ndarray t2)
+- path saveRawData(str path, dict settings)
+- int convertToPhotonHDF5(str path, pyqt.Signal signal)
 - saveHdfDict(dict dictionary, str folder, str filename)
 - saveSetsDict(dict dictionary, str folder, str filename)
 - loadSetsDict(str path)

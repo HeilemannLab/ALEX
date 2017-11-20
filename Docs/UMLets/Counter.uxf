@@ -6,15 +6,14 @@
     <coordinates>
       <x>20</x>
       <y>20</y>
-      <w>500</w>
-      <h>280</h>
+      <w>560</w>
+      <h>260</h>
     </coordinates>
     <panel_attributes>Counter
 multiprocessing.Process
 Counter.py
 --
 - daemon: bool
-- _sets: dict
 - _readArraySize: int
 - _N: int
 - _apd: libs.APD.TimestampingCounter
@@ -23,7 +22,7 @@ Counter.py
 - _dataQ: multiprocessing.Queue
 - _sem: multiprocessing.Semaphore
 --
-- __init__(event running, dict dictionary, queue dataQ, int readArraySize, int N)
+- __init__(event running, queue dataQ, int readArraySize, semaphore semaphore, int N)
 - run()
 - Measurement()
 - __del__()

@@ -17,9 +17,11 @@ from multiprocessing import Process
 
 class Laser(Process):
     """
-    The laser class is a subclass of multiprocessing.Process. It serves to run the
-    illumination class as long as the measurements takes place. It also starts and
-    stops the timing task, which provides sampling and especially the trigger edge.
+    The laser class is a subclass of multiprocessing.Process.
+    It serves to run the illumination class as long as the
+    measurements takes place. It also starts and stops the
+    timing task, which provides sampling and especially the
+    trigger edge.
     """
     def __init__(self, running, dictionary, semaphore):
         """
@@ -42,9 +44,11 @@ class Laser(Process):
 
     def run(self):
         """
-        The timing starts after the illumination because of the ArmStartTrigger, which makes the tasks wait
-        for the next edge. So starting beforehands could desynchronize tasks. The while loop is rather a
-        dummy thing, since it only passes by time until measurement is indicated as done by self._running.
+        The timing task starts after the illumination task because
+        of the ArmStartTrigger, which synchronizes the tasks. So
+        starting timing task before could end in unsynchronized tasks.
+        The while loop is rather a dummy thing, since it only delays
+        the method until measurement is indicated as done by self._running.
         """
         self._timing.InitClock()
         self._analog.InitAnalog()

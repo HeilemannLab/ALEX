@@ -9,8 +9,7 @@
 # Department: Single Molecule Biophysics
 # License: GPL3
 #####################################################################'''
-import libs.APD_gate
-# import libs.APD
+import libs.APD
 import numpy as np
 from multiprocessing import Process
 
@@ -21,6 +20,8 @@ class Counter(Process):
     functionalty is to start the measurement via the APD class in a new
     process. The multiprocessing.Event variable 'running' is the control
     variable which enables control over the while loop from the mainwindow.
+    The class does not discriminate between 'Finite' or 'Continuous'
+    measurements, it the same either way.
     """
     def __init__(self, running, dataQ, readArraySize, semaphore, N):
         """
@@ -38,13 +39,14 @@ class Counter(Process):
         self._data = np.zeros([self._readArraySize, 2], dtype=int)
         self._sem = semaphore
         self._N = N
-        self._apd = libs.APD_gate.APD(self._readArraySize, self._N, self._sem)
+        self._apd = libs.APD.APD(self._readArraySize, self._N, self._sem)
 
     def run(self):
         """
         run() is obligatory for subprocesses. In the parent it gets
         called by start(). Here the APD class instance and the
-        measurement get started.
+        measurement get started. The measurement method runs until
+        '_running' changed its internal flag.
         """
         self._apd.startCounting()
         self.Measurement()

@@ -20,7 +20,7 @@ Animation.py
 - _greenData: list
 - _redData: list
 - _greenLine: pyplot.Line2D
-- _redLine: pyplot.lines.Line2D
+- _redLine: pyplot.Line2D
 - _figure: pyplot.figure
 - anim: pyplot.animation
 - _axLimit: int

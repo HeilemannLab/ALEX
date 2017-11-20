@@ -1,0 +1,24 @@
+'''######################################################################
+# File Name:
+# Project:
+# Version:
+# Creation Date:
+# Created By:
+# Company: Goethe University of Frankfurt
+# Institute: Institute of Physical and Theoretical Chemistry
+# Department: Single Molecule Biophysics
+# License: GPL3
+#####################################################################'''
+import seaborn
+import matplotlib.pyplot as plt
+import numpy as np
+
+
+def sinplot():
+    x = np.linspace(0, 14, 100)
+    for i in range(1, 7):
+        plt.plot(x, np.sin(x + i * 0.5) * (7 - i))
+seaborn.set_context('paper')
+with seaborn.axes_style("darkgrid", {'axes.facecolor': '0.8', 'figure.facecolor': '0.85'}):
+    sinplot()
+plt.show()

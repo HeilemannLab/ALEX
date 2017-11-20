@@ -6,8 +6,8 @@
     <coordinates>
       <x>20</x>
       <y>20</y>
-      <w>530</w>
-      <h>320</h>
+      <w>600</w>
+      <h>290</h>
     </coordinates>
     <panel_attributes>DataProcesser
 multiprocessing.Process
@@ -16,17 +16,15 @@ DataProcesser.py
 - daemon: bool
 - _dataQ: multiprocessing.Queue
 - _animDataQ: multiprocessing.Queue
-- _resultQ: multiprocessing.Queue
 - _readArraySize: int
 - _N: int
 - _folder: WindowsPath
 - _timestamps: ndarray
-- array: object
-- n1: float
-- n2: float
-- n3: float
+- _int_max: int
+- n1: int
+- n2: int
 --
-- __init__(queue dataQ, queue animDataQ, queue resultQ, int readArraySize, int N)
+- __init__(queue dataQ, queue animDataQ, queue resultQ, int readArraySize, int N, path folder)
 - run()
 - dataProcessing()
 - __del__()
