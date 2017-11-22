@@ -46,6 +46,9 @@ class Communicate(QObject):
                      and the measurement duration ends
     warning: sends a warning when the count rates exceed certain value (apd dependent)
     displayRates: sends the count rates from animation to LCDDisplay in mainwindow
+    convertDone: sends a message that the conversion is done
+    alreadyConverted: found converted data in the directory
+    noData: found no data files in the directory
     """
 
     def __init__(self):
@@ -56,6 +59,8 @@ class Communicate(QObject):
     warning = pyqtSignal()
     displayRates = pyqtSignal(list)
     convertDone = pyqtSignal()
+    alreadyConverted = pyqtSignal()
+    noData = pyqtSignal()
 
 
 class MainWindow(QMainWindow):
@@ -101,6 +106,8 @@ class MainWindow(QMainWindow):
         self.signal.warning.connect(self.warnPopUp)
         self.signal.displayRates.connect(lambda x: self.displayRatesOnLCD(x))
         self.signal.convertDone.connect(lambda: self.statusBar.showMessage('Conversion done!'))
+        self.signal.alreadyConverted.connect(lambda: self.statusBar.showMessage('Already converted!'))
+        self.signal.noData.connect(lambda: self.statusBar.showMessage('No data files in this directory!'))
 
         # ################## #
         # Window and widgets #
@@ -129,7 +136,7 @@ class MainWindow(QMainWindow):
         # convert data to photon-hdf5
         self.convertData = QAction('Convert raw data to photon-hdf5', self)
         self.convertData.setShortcut('Ctrl+c')
-        self.convertData.triggered.connect(lambda: self._files.convertToPhotonHDF5(self.getDirectory(), self.signal.convertDone))
+        self.convertData.triggered.connect(lambda: self._files.convertToPhotonHDF5(self.getDirectory(), self.signal))
 
         # change ReadArray size
         self.setArraySize = QAction('Read arrays size', self)

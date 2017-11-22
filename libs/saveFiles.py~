@@ -124,6 +124,14 @@ class SaveFiles:
         @return: int
         """
         path = pathlib.Path(path)
+        check = path / 'smALEX.hdf'
+        if check.exists():
+            signal.alreadyConverted.emit()
+            return 0
+        check = path / 'smALEX_APD1.hdf'
+        if not check.exists():
+            print("no data files")
+            return 0
 
         # open to append rest oft required dict and convert to photon-hdf5
         dictionary = self.loadSetsDict(path / 'HDF_additional_info.p')
@@ -158,7 +166,7 @@ class SaveFiles:
         self._saveHDF.assembleDictionary(self._hdf_dict)
         self._saveHDF.saveAsHDF(str(path / 'smALEX.hdf'))
         print("Data stored in photon-hdf5.")
-        signal.emit()
+        signal.convertDone.emit()
         return 1
 
     def merge_timestamps(self, t1, t2):
