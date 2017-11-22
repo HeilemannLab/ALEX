@@ -56,10 +56,9 @@ class Animation:
         The style is a seaborn one, where the figure and the plot
         background are darkened to avoid a glaring display.
         """
-        # sns.set()   # seaborn plot style
         sns.set_context('paper')
-        with sns.axes_style("darkgrid", {'axes.facecolor': '0.8',
-                                         'figure.facecolor': '0.85'}):
+        with sns.axes_style("darkgrid", {'axes.facecolor': '0.7',
+                                         'figure.facecolor': '0.7'}):
             ax = self._figure.add_subplot(111)
 
             self._greenLine = Line2D([], [], color='green')

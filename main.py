@@ -25,6 +25,7 @@ def Main():
 
     app = QApplication(sys.argv)
     mainWindow = mw.MainWindow()
+    # mainWindow.setStyleSheet("QMainWindow {background: 'darkgrey';}")
     mainWindow.show()
     sys.exit(app.exec_())
 

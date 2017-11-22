@@ -98,5 +98,5 @@ class Timetrace:
         ax2.plot(self._num2, self._red_trace, 'r')
 
         fig.subplots_adjust(hspace=0.5)
-        plt.show()
         plt.savefig(str(directory / 'timetrace.png'))
+        plt.show()

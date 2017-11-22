@@ -154,7 +154,7 @@ class MainWindow(QMainWindow):
 
         self._location = QLineEdit()
         self._location.setToolTip("Please select a directory. If you do not, the data will not be saved!")
-        self._location.setMaxLength(50)
+        self._location.setMaxLength(100)
         self._location.setReadOnly(True)
         hbox12.addWidget(self._location)
         hbox12.setSpacing(10)
@@ -396,6 +396,7 @@ class MainWindow(QMainWindow):
         # ## General Layout settings:
         self.centralBox = QGroupBox("Settings")
         self.setCentralWidget(self.centralBox)
+        # self.centralWidget.setStyleSheet("QMainWindow {background: 'yellow';}");
 
         # Arrange groups in grid:
         grid = QGridLayout()
@@ -474,6 +475,7 @@ class MainWindow(QMainWindow):
         """Close also the animation window when the red 'X' button is pressed."""
         try:
             self._anim.__del__()
+            self._files.
         except:
             pass
         sys.exit(0)
@@ -527,7 +529,7 @@ class MainWindow(QMainWindow):
         if not self._running.is_set():
             self._running.set()
             try:
-                plt.close(1)
+                plt.close('all')
             except:
                 pass
             self.startProcesses()
@@ -715,7 +717,8 @@ class MainWindow(QMainWindow):
                 print("All workers have joined.")
 
             # Print the timetrace of the data, is also saved as *.png into the data folder
-            self._timetrace.doThings(self._new_folder)
+            if not self._new_folder == 'Cont':
+                self._timetrace.doThings(self._new_folder)
             # Unfortunately there is no other way than deleting the queues
             # If not done so, the rest data will be shown in the next measurement
             # instead of the new data.

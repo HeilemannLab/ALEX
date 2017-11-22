@@ -128,12 +128,11 @@ class SaveFiles:
         # open to append rest oft required dict and convert to photon-hdf5
         dictionary = self.loadSetsDict(path / 'HDF_additional_info.p')
         self._hdf_dict.update(dictionary)
-        self._hdf_dict = self._mask.maskWindow(self._hdf_dict)
-
-        del self._mask
-        self._mask, saveNote = libs.HDFmask.HDFmask()
+        self._hdf_dict, saveNote = self._mask.maskWindow(self._hdf_dict)
         if not saveNote:
             return 0
+        del self._mask
+        self._mask = libs.HDFmask.HDFmask()
         # array 1
         f1 = tables.open_file(str(path / 'smALEX_APD1.hdf'), 'r')
         row = f1.root.timestamps[:, :]

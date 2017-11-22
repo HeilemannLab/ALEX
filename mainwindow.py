@@ -154,7 +154,7 @@ class MainWindow(QMainWindow):
 
         self._location = QLineEdit()
         self._location.setToolTip("Please select a directory. If you do not, the data will not be saved!")
-        self._location.setMaxLength(50)
+        self._location.setMaxLength(100)
         self._location.setReadOnly(True)
         hbox12.addWidget(self._location)
         hbox12.setSpacing(10)
@@ -396,6 +396,7 @@ class MainWindow(QMainWindow):
         # ## General Layout settings:
         self.centralBox = QGroupBox("Settings")
         self.setCentralWidget(self.centralBox)
+        # self.centralWidget.setStyleSheet("QMainWindow {background: 'yellow';}");
 
         # Arrange groups in grid:
         grid = QGridLayout()
@@ -527,7 +528,7 @@ class MainWindow(QMainWindow):
         if not self._running.is_set():
             self._running.set()
             try:
-                plt.close(1)
+                plt.close('all')
             except:
                 pass
             self.startProcesses()

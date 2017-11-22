@@ -19,6 +19,6 @@ def sinplot():
     for i in range(1, 7):
         plt.plot(x, np.sin(x + i * 0.5) * (7 - i))
 seaborn.set_context('paper')
-with seaborn.axes_style("darkgrid", {'axes.facecolor': '0.7', 'figure.facecolor': '0.7'}):
+with seaborn.axes_style("darkgrid", {'axes.facecolor': '0.7', 'figure.facecolor': '0.6'}):
     sinplot()
 plt.show()
