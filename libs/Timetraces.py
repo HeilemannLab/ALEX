@@ -13,6 +13,7 @@ import numpy as np
 import tables
 import matplotlib.pyplot as plt
 import pathlib
+import seaborn as sns
 
 
 class Timetrace:
