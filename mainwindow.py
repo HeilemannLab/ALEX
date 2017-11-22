@@ -527,6 +527,9 @@ class MainWindow(QMainWindow):
         """
         if not self._running.is_set():
             self._running.set()
+            # try to close animation and timetrace window
+            # if timetrace does not close reliably, it could
+            # cause problems
             try:
                 plt.close('all')
             except:

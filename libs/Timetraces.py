@@ -86,17 +86,20 @@ class Timetrace:
         self._num2 = np.arange(self._num2)
 
     def plot(self, directory):
-        fig = plt.figure()
-        ax1 = fig.add_subplot(2, 1, 1)
-        ax1.plot(self._num1, self._green_trace, 'g')
-        ax1.set_ylabel('kHz')
-        ax1.set_xlabel('ms')
+        sns.set_context('paper')
+        with sns.axes_style("darkgrid", {'axes.facecolor': '0.7', 'figure.facecolor': '0.7'}):
+            fig = plt.figure()
+            ax1 = fig.add_subplot(2, 1, 1)
+            ax1.plot(self._num1, self._green_trace, 'g')
+            ax1.set_ylabel('kHz')
+            ax1.set_xlabel('ms')
 
-        ax2 = fig.add_subplot(2, 1, 2)
-        ax2.set_xlabel('ms')
-        ax2.set_ylabel('kHz')
-        ax2.plot(self._num2, self._red_trace, 'r')
+            ax2 = fig.add_subplot(2, 1, 2)
+            ax2.set_xlabel('ms')
+            ax2.set_ylabel('kHz')
+            ax2.plot(self._num2, self._red_trace, 'r')
 
-        fig.subplots_adjust(hspace=0.5)
-        plt.savefig(str(directory / 'timetrace.png'))
-        plt.show()
+            fig.subplots_adjust(hspace=0.5)
+            # the savefig should have white facecolor, but can be altered
+            plt.savefig(str(directory / 'timetrace.png'))
+            plt.show()

@@ -475,7 +475,6 @@ class MainWindow(QMainWindow):
         """Close also the animation window when the red 'X' button is pressed."""
         try:
             self._anim.__del__()
-            self._files.
         except:
             pass
         sys.exit(0)

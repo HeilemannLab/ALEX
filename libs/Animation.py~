@@ -57,7 +57,7 @@ class Animation:
         background are darkened to avoid a glaring display.
         """
         sns.set_context('paper')
-        with sns.axes_style("darkgrid", {'axes.facecolor': '077',
+        with sns.axes_style("darkgrid", {'axes.facecolor': '0.7',
                                          'figure.facecolor': '0.7'}):
             ax = self._figure.add_subplot(111)
 
