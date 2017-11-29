@@ -114,15 +114,15 @@ class APD:
                                                countDirection=DAQmx_Val_CountUp)
         self._rollover1.SetCICountEdgesTerm("", "/Dev2/PFI35")
 
-        self._counter1.SetCIDupCountPrevent("/Dev2/ctr0", True)
-        self._rollover1.SetCIDupCountPrevent("/Dev2/ctr1", True)
+        # self._counter1.SetCIDupCountPrevent("/Dev2/ctr0", True)
+        # self._rollover1.SetCIDupCountPrevent("/Dev2/ctr1", True)
 
         self._counter1.ExportSignal(signalID=DAQmx_Val_CounterOutputEvent,
                                     outputTerminal="/Dev2/PFI35")
         self._counter1.SetExportedCtrOutEventOutputBehavior(DAQmx_Val_Pulse)
 
-        self._counter1.SetSampClkOverrunBehavior(data=DAQmx_Val_IgnoreOverruns)
-        self._rollover1.SetSampClkOverrunBehavior(data=DAQmx_Val_IgnoreOverruns)
+        # self._counter1.SetSampClkOverrunBehavior(data=DAQmx_Val_IgnoreOverruns)
+        # self._rollover1.SetSampClkOverrunBehavior(data=DAQmx_Val_IgnoreOverruns)
 
     def InitializeCounter2(self):
         """
@@ -145,11 +145,11 @@ class APD:
                                                countDirection=DAQmx_Val_CountUp)
         self._rollover2.SetCICountEdgesTerm("", "/Dev2/PFI27")
 
-        self._counter2.SetSampClkOverrunBehavior(data=DAQmx_Val_IgnoreOverruns)
-        self._rollover2.SetSampClkOverrunBehavior(data=DAQmx_Val_IgnoreOverruns)
+        # self._counter2.SetSampClkOverrunBehavior(data=DAQmx_Val_IgnoreOverruns)
+        # self._rollover2.SetSampClkOverrunBehavior(data=DAQmx_Val_IgnoreOverruns)
 
-        self._counter2.SetCIDupCountPrevent("/Dev2/ctr2", True)
-        self._rollover2.SetCIDupCountPrevent("/Dev2/ctr3", True)
+        # self._counter2.SetCIDupCountPrevent("/Dev2/ctr2", True)
+        # self._rollover2.SetCIDupCountPrevent("/Dev2/ctr3", True)
 
         self._counter2.ExportSignal(signalID=DAQmx_Val_CounterOutputEvent,
                                     outputTerminal="/Dev2/PFI27")
