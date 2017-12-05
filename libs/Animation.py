@@ -32,7 +32,7 @@ class Animation:
         self._animDataQ1 = animDataQ1
         self._animDataQ2 = animDataQ2
         self._signal = signal
-        self._dt = 0.01
+        self._dt = 0.05
         self._tdata = [0]
         self._greenData = [0]
         self._redData = [0]
@@ -40,7 +40,7 @@ class Animation:
         self._redLine = 0
         self._figure = pyplot.figure()
         self.anim = 0
-        self._axLimit = 2e4
+        self._axLimit = 1e4
 
     def run(self):
         """

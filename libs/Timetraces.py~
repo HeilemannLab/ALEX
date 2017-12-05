@@ -15,7 +15,16 @@ import matplotlib.pyplot as plt
 import pathlib
 import seaborn as sns
 
+
 class Timetrace:
+    """
+    The timetrace class provides a binnded timetrace of
+    raw data on hdf files. It is specially tailored to the
+    application (file names). It contains methods to load
+    data in RAM using numpy arrays, to correct for rollover
+    in RAM, to bin timestamps in 10ms bins and adjust values
+    to kHz, and to plot the data on matplotlib/seaborn graph.
+    """
     def __init__(self):
         self._green_trace = 0
         self._red_trace = 0
@@ -23,12 +32,31 @@ class Timetrace:
         self._num2 = 0
 
     def correctRollover(self, t1, t2):
+        """
+        Numpy arrays get corrected for rollover, using
+        the rollover tracking. This applies specifically
+        to 32bit counters.
+        @param t1: ndarray
+        @param t2: ndarray
+        @return t1: ndarray
+        @return t2: ndarray
+        """
         int_32 = (2**32) - 1
         t1[:, 0] = t1[:, 0] + (int_32 * t1[:, 1])
         t2[:, 0] = t2[:, 0] + (int_32 * t2[:, 1])
         return t1, t2
 
     def binnedTrace(self, array):
+        """
+        Timestamps get binned in bins of the size 10ms.
+        The parameter bins gets augmented as long the
+        data is in the n*1e6 window. If it reaches the
+        limit, bins gets written to trace and reset,
+        and the window counter n gets augmented.
+        @param array: ndarray
+        @return trace: list
+        @return n: int
+        """
         trace = []
         n = 1
         bins = 0
@@ -41,8 +69,16 @@ class Timetrace:
         return trace, n - 1
 
     def binnedTrace1(self, array):
+        """
+        n_bin calculate the expected bin number, used
+        as size for trace. The data gets binned in 10 ms
+        bins again, this time using a while loop. The
+        advantage of this method is the ndarrays (better
+        than list.append), disadvantage is a sensitivity
+        to rollover errors (you'll see just zeros
+        after the error)
+        """
         n_bin = int(np.floor((array[-1] - array[0]) / (1e6)))
-        print(n_bin, array[-1])
         trace = np.zeros([n_bin, 1], dtype=np.int64)
         j = 0
         for i in range(len(trace)):

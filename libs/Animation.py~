@@ -40,7 +40,7 @@ class Animation:
         self._redLine = 0
         self._figure = pyplot.figure()
         self.anim = 0
-        self._axLimit = 2e4
+        self._axLimit = 1e4
 
     def run(self):
         """
@@ -57,8 +57,7 @@ class Animation:
         background are darkened to avoid a glaring display.
         """
         sns.set_context('paper')
-        with sns.axes_style("darkgrid", {'axes.facecolor': '0.7',
-                                         'figure.facecolor': '0.7'}):
+        with sns.axes_style("darkgrid", {'axes.facecolor': '0.7', 'figure.facecolor': '0.7'}):
             ax = self._figure.add_subplot(111)
 
             self._greenLine = Line2D([], [], color='green')
