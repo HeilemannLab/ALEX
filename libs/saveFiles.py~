@@ -130,7 +130,7 @@ class SaveFiles:
             return 0
         check = path / 'smALEX_APD1.hdf'
         if not check.exists():
-            print("no data files")
+            signal.noData.emit()
             return 0
 
         # open to append rest oft required dict and convert to photon-hdf5

@@ -35,9 +35,9 @@
       <w>130</w>
       <h>50</h>
     </coordinates>
-    <panel_attributes>UIsettings
+    <panel_attributes>ChangeReadArray
 -
-Settings dictionary</panel_attributes>
+</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
@@ -397,12 +397,12 @@ fg=orange</panel_attributes>
     <coordinates>
       <x>900</x>
       <y>350</y>
-      <w>130</w>
+      <w>140</w>
       <h>90</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;-
-Add info</panel_attributes>
-    <additional_attributes>10.0;30.0;20.0;70.0;110.0;70.0;110.0;10.0;50.0;10.0</additional_attributes>
+</panel_attributes>
+    <additional_attributes>10.0;30.0;20.0;70.0;120.0;70.0;120.0;10.0;50.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
@@ -474,7 +474,7 @@ fg=orange</panel_attributes>
     </coordinates>
     <panel_attributes>Timetraces
 --
-Measurement plot</panel_attributes>
+Plot time-intensity</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
@@ -537,5 +537,31 @@ style=wordwrap</panel_attributes>
 Feed data
 fg=blue</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1030</x>
+      <y>130</y>
+      <w>130</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>UIsettings
+-
+Settings dictionary</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>920</x>
+      <y>380</y>
+      <w>110</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>Add info
+Save raw data
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
   </element>
 </diagram>

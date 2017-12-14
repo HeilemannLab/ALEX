@@ -728,6 +728,7 @@ class MainWindow(QMainWindow):
             # Print the timetrace of the data, is also saved as *.png into the data folder
             if not self._new_folder == 'Cont':
                 self._timetrace.doThings(self._new_folder)
+                self._files.convertToPhotonHDF5(self._new_folder, self.signal)
             # Unfortunately there is no other way than deleting the queues
             # If not done so, the rest data will be shown in the next measurement
             # instead of the new data.

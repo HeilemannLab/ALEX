@@ -46,6 +46,9 @@ class Communicate(QObject):
                      and the measurement duration ends
     warning: sends a warning when the count rates exceed certain value (apd dependent)
     displayRates: sends the count rates from animation to LCDDisplay in mainwindow
+    convertDone: sends a message that the conversion is done
+    alreadyConverted: found converted data in the directory
+    noData: found no data files in the directory
     """
 
     def __init__(self):
