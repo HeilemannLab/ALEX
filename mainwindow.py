@@ -79,10 +79,11 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
         """
         Init hosts all the variables and UI related functionality. The following classes
-        can not be initializes in here, because they inherit from multiprocessing.Process: libs.Counter,
-        libs.Laser and libs.dataProcesser. Arguments have to be passed by inheritance, later there's no
-        possibility, due to their separation from the main loop. libs.Animation also gets instanciated
-        later, due to the window launching functionality in its init method.
+        can not be initializes in here, because they inherit from multiprocessing.Process:
+        libs.Counter, libs.Laser and libs.dataProcesser. Arguments have to be passed by
+        inheritance, later there's no possibility, due to their separation from the main
+        loop. libs.Animation also gets instanciated later, due to the window launching
+        functionality in its init method.
         """
         self._dict = libs.UIsettings.UIsettings()
         self._files = libs.SaveFiles.SaveFiles()

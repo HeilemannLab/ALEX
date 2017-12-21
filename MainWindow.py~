@@ -337,7 +337,7 @@ class MainWindow(QMainWindow):
         # Measurement duration QSpinBox
         self.duration = QSpinBox(self)
         self.duration.setMinimum(0)
-        self.duration.setMaximum(300)
+        self.duration.setMaximum(600)
         self.duration.setValue(300.0)
         self.duration.valueChanged.connect(lambda: self.refreshUI(1, 'duration', self.duration.value()))
         hbox4.addWidget(self.duration)
