@@ -39,6 +39,6 @@ ax.step(t, greenP, color='green', linestyle='-')
 ax.step(t, redP, color='red', linestyle='-')
 ax.step(t, sig2, color='black', linestyle='--')
 ax.yaxis.set_ticks_position('both')
-plt.tick_params(axis='y', which='both', labelleft='off', labelright='off')
+# plt.tick_params(axis='y', which='both', labelleft='on', labelright='on')
 
 plt.show()

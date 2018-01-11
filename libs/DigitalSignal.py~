@@ -50,7 +50,7 @@ class DigitalSignal:
         """
         The signal is generated on the base of daqmx COPulseChanTime task, which
         suits the need of interleaved signal perfectly. A high and a low Time can
-        be configured, so an initial delay can, which make the alternation possible.
+        be configured, and an initial delay, which make the alternation possible.
         All values are in seconds (As far as nidaqmx documentation states, there's
         no smaller possibility). The digital signal does not take into account at
         which power percentage the lasers should be operated. The height of the signal
@@ -123,7 +123,7 @@ class DigitalSignal:
 
     def startIllumination(self):
         """
-        Inits the digital tasks, start analogue signal and after that starts digital tasks.
+        Inits the digital tasks, start analog signal and after that starts digital tasks.
         """
         self.InitIllumination()
 
@@ -133,7 +133,10 @@ class DigitalSignal:
         self._sil2.StartTask()
 
     def triggerIllumination(self):
-        """ArmStartTrigger for all tasks. Source from RTSI0, which is provided by the timing class."""
+        """
+        ArmStartTrigger for all tasks. Source from RTSI0, which
+        is provided by the timing class.
+        """
         self._green.SetArmStartTrigType(data=DAQmx_Val_DigEdge)
         self._red.SetArmStartTrigType(data=DAQmx_Val_DigEdge)
         self._sil.SetArmStartTrigType(data=DAQmx_Val_DigEdge)
