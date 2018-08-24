@@ -1,6 +1,9 @@
 # ALEX
 Alternating Laser Excitation of Confocal Single Molecule Microscopes for Single Molecule FRET
 
+The Code was initialized by a master student:
+https://github.com/kfriedl
+
 The Code is designed to work in combination with the FRETBursts package by Ingargiola et al. (2016):
 https://github.com/tritemio/FRETBursts/
 
